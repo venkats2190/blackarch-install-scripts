@@ -159,11 +159,11 @@ update_system()
         fi
     fi
 
-    if [ -n "${LIVE}" ]; then
-        pacman-key --init
-        pacman-key -r 4345771566D76038C7FEB43863EC0ADBEA87E4E3
-        pacman-key --lsign-key 4345771566D76038C7FEB43863EC0ADBEA87E4E3
-    fi
+    wget http://blackarch.org/blackarch/blackarch/os/x86_64/blackarch-keyring-20140108-1-any.pkg.tar.xz{,.sig}
+    gpg --keyserver hkp://pgp.mit.edu --recv-keys '4345771566D76038C7FEB43863EC0ADBEA87E4E3'
+    gpg --with-fingerprint blackarch-keyring-20140108-1-any.pkg.tar.xz.sig
+    pacman -U blackarch-keyring-20140108-1-any.pkg.tar.xz --noconfirm
+
     pacman -Syy --noconfirm "${LIVE+-u}"
 
     return "${SUCCESS}"
@@ -241,11 +241,11 @@ format_filesystem()
         boot_part="${boot_part}1"
         swap_part="${swap_part}2"
 	root_part="${root_part}3"
-	
+
 	"mkfs.${boot_type}" -L boot "${boot_part}"; check_mkfs_status
 	printf "[+] Created boot partition: %s - ext2\n" "${boot_part}"
 
-	if [ $LUKS == "YES" ]; then	
+	if [ $LUKS == "YES" ]; then
 		#Format and encrypt ROOT partition
 		printf "[+] Formatting ROOT partiton, please type your passphrase for encryption : \n"
 		cryptsetup -y -v luksFormat "${root_part}"
@@ -253,7 +253,7 @@ format_filesystem()
 		cryptsetup open "${root_part}" cryptroot
 		"mkfs.${root_type}" -L root "/dev/mapper/cryptroot"; check_mkfs_status
 		printf "[+] Created root encrypted partition: /dev/mapper/cryptroot - ext4\n"
-	
+
 	else
 		"mkfs.${root_type}" -L root "${root_part}"; check_mkfs_status
 		printf "[+] Created root partition: %s - ext4\n" "${root_part}"
@@ -292,7 +292,7 @@ manual_partition()
     read a; [ "${a}" != "" ] && boot_type="${a}"
     printf "    -> Number of the Swap partition created [3]: "
     read a; [ "${a}" != "" ] && swap_part="${a}"
-    
+
     # about to format
     printf "%s" "${RED}"
     printf "\n[!!] About to create and format partitions:\n"
@@ -331,7 +331,7 @@ ask_for_luks()
 
 }
 
-setup_filesystem()	    
+setup_filesystem()
 {
     printf "%s" "${WHITE}"
     # user input settings
