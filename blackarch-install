@@ -191,8 +191,7 @@ check_mkfs_status()
 }
 
 
-# manual mode
-manual_partition()
+format_partition()
 {
 
     printf "[+] Create new partitions with cfdisk [only boot and root]\n"
@@ -257,7 +256,7 @@ setup_filesystem()
     printf "    -> Hard Drive Selected: %s\n" "${HD}"
 
     # partitioning
-    manual_partition
+    format_partition
 
     printf "%s" "${NC}"
 
