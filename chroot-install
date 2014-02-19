@@ -308,7 +308,7 @@ install()
 
     wprintf "[+] Re-Generating initfs..."
     generate_initfs
-    
+
     wprintf "[+] Setting blackarch hostname..."
     hostname blackarch
 
