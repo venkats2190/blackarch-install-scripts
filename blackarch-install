@@ -229,42 +229,43 @@ format_filesystem()
         parted -s "${HD}" mklabel msdos
         check_parted_status
 
-	(echo n; echo p; echo 1; echo ; echo +${boot_size}; echo w; echo q) | fdisk ${HD}
+        parted -a optimal "${boot_part}" mkpart primary 0% "${boot_size}"
+        #(echo n; echo p; echo 1; echo ; echo +${boot_size}; echo w; echo q) | fdisk ${HD}
         check_parted_status
         # partition bootable
         parted "${boot_part}" set 1 boot on
         check_parted_status
 
-	(echo n; echo p; echo 2; echo ; echo +${swap_size}; echo w; echo q) | fdisk ${HD}
-	check_parted_status
+        (echo n; echo p; echo 2; echo ; echo +${swap_size}; echo w; echo q) | fdisk ${HD}
+        check_parted_status
 
-	(echo n; echo p; echo 3; echo ; echo +${root_size}; echo w; echo q) | fdisk ${HD}
-	check_parted_status
+        (echo n; echo p; echo 3; echo ; echo +${root_size}; echo w; echo q) | fdisk ${HD}
+        check_parted_status
 
 
         boot_part="${boot_part}1"
         swap_part="${swap_part}2"
-	root_part="${root_part}3"
+        root_part="${root_part}3"
 
-	"mkfs.${boot_type}" -L boot "${boot_part}"; check_mkfs_status
-	printf "[+] Created boot partition: %s - ext2\n" "${boot_part}"
+        "mkfs.${boot_type}" -L boot "${boot_part}"; check_mkfs_status
+        printf "[+] Created boot partition: %s - ext2\n" "${boot_part}"
 
-	if [ $LUKS == "YES" ]; then
-		#Format and encrypt ROOT partition
-		printf "[+] Formatting ROOT partiton, please type your passphrase for encryption : \n"
-		cryptsetup -y -v luksFormat "${root_part}"
-		printf "[+] Openning encrypted partition, re-enter your passphrase : \n"
-		cryptsetup open "${root_part}" cryptroot
-		"mkfs.${root_type}" -L root "/dev/mapper/cryptroot"; check_mkfs_status
-		printf "[+] Created root encrypted partition: /dev/mapper/cryptroot - ext4\n"
+        if ${LUKS}; then
+            #Format and encrypt ROOT partition
+            printf "[+] Formatting ROOT partiton, please type your passphrase for encryption : \n"
+            cryptsetup -y -v luksFormat "${root_part}"
+            printf "[+] Openning encrypted partition, re-enter your passphrase : \n"
+            cryptsetup open "${root_part}" cryptroot
+            "mkfs.${root_type}" -L root "/dev/mapper/cryptroot"; check_mkfs_status
+            printf "[+] Created root encrypted partition: /dev/mapper/cryptroot - ext4\n"
 
-	else
-		"mkfs.${root_type}" -L root "${root_part}"; check_mkfs_status
-		printf "[+] Created root partition: %s - ext4\n" "${root_part}"
-	fi
+        else
+            "mkfs.${root_type}" -L root "${root_part}"; check_mkfs_status
+            printf "[+] Created root partition: %s - ext4\n" "${root_part}"
+        fi
 
-	/usr/bin/mkswap ${swap_part}; check_mkfs_status
-	printf "[+] Created Swap partition: %s - SWAP\n" "${swap_part}"
+        /usr/bin/mkswap "${swap_part}"; check_mkfs_status
+        printf "[+] Created Swap partition: %s - SWAP\n" "${swap_part}"
 
     else
         # go back to setup up filesystem
@@ -310,7 +311,7 @@ manual_partition()
     if [ "${a}" == "y" ] || [ "${a}" == "Y" ]; then
         "mkfs.${boot_type}" -L boot "${boot_part}"; check_mkfs_status
         "mkfs.${root_type}" -L root "${root_part}"; check_mkfs_status
-	"mkfswap ${swap_part}"; check_mkfs_status
+        "mkfswap ${swap_part}"; check_mkfs_status
     else
         # go back to setup up filesystem
         setup_filesystem
@@ -324,10 +325,10 @@ ask_for_luks()
 {
     printf "%s" "${WHITE}"
     # user input for luks
-    printf "[+] Do you want full encrypted root? (YES in upper case) :\n"
-    read LUKS;
+    printf "[+] Do you want full encrypted root? [y/N]:"; read a;
 
-    if [ $LUKS == "YES" ]; then
+    if [ "${a}" == "y" ] || [ "${a}" == "Y" ]; then
+        LUKS="true"
 	    printf "[!] Root will be encrypted\n"
     else
 	    printf "[!] Root will NOT be encrypted\n"
@@ -369,7 +370,7 @@ setup_filesystem()
 mount_filesystem()
 {
     mkdir -p "${ROOT}"
-    if [ $LUKS == "YES" ]; then
+    if ${LUKS}; then
 	    mount -t "${root_type}" /dev/mapper/cryptroot "${ROOT}"
     else
 	    mount -t "${root_type}" "${root_part}" "${ROOT}"

@@ -38,6 +38,9 @@ NC="$(tput sgr0)" # No Color
 # BA REPO DEFAULT
 BLACKARCH_REPO_URL='http://www.blackarch.org/blackarch/$repo/os/$arch'
 
+# luks global variable
+LUKS="false"
+
 # printf white
 wprintf() {
     fmt=$1
@@ -212,12 +215,10 @@ install_grub()
     grub-mkconfig -o /boot/grub/grub.cfg
     sed -i 's/Arch Linux, with Linux core repo kernel/BlackArch Linux/' \
         /boot/grub/grub.cfg
-    sed -i 's/rw  quiet/rw cryptdevice=\/dev\/sda3:cryptboot/' \
-	/boot/grub/grub.cfg
+    ${LUKS} && sed -i 's/rw  quiet/rw cryptdevice=\/dev\/sda3:cryptboot/' \
+	    /boot/grub/grub.cfg
 
     grub-install "${HD}"
-
-    #update-grub
 
     return "${SUCCESS}"
 }
@@ -306,8 +307,8 @@ install()
     wprintf "[+] Configure system users..."
     configure_users
 
-    wprintf "[+] Re-Generating initfs..."
-    generate_initfs
+    ${LUKS} && wprintf "[+] Re-Generating initfs..."
+    ${LUKS} && generate_initfs
 
     wprintf "[+] Setting blackarch hostname..."
     hostname blackarch
