@@ -328,7 +328,7 @@ install()
 # parse command line options
 get_opts()
 {
-    while getopts lrbd:vVH flags
+    while getopts lrbd:LvVH flags
     do
         case "${flags}" in
             l)
@@ -342,6 +342,9 @@ get_opts()
                 ;;
             d)
                 HD=${OPTARG}
+                ;;
+            L)
+                LUKS="true"
                 ;;
             v)
                 VERBOSE="/dev/stdout"

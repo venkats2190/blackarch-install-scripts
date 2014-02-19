@@ -44,6 +44,9 @@ MENU_LIVE="1"
 MENU_REPO="2"
 MENU_BLACKMAN="3"
 
+# luks global var
+LUKS="false"
+
 # blackarchinstall version
 VERSION="v0.6.3beta1"
 
@@ -413,7 +416,7 @@ install_chroot()
     mount --rbind /dev "${ROOT}/dev"
     mount --rbind /sys "${ROOT}/sys"
 
-    chroot "${ROOT}" "/bin/chroot-install" "${mode}" -d "${HD}"
+    chroot "${ROOT}" "/bin/chroot-install" "${mode}" -d "${HD}" "$(${LUKS} && printf '-L')"
 
     # cleaning up
     rm -rf "${ROOT}/bin/${chroot_file}"
