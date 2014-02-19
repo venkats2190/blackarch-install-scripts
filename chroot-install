@@ -215,7 +215,7 @@ install_grub()
     grub-mkconfig -o /boot/grub/grub.cfg
     sed -i 's/Arch Linux, with Linux core repo kernel/BlackArch Linux/' \
         /boot/grub/grub.cfg
-    ${LUKS} && sed -i 's/rw  quiet/rw cryptdevice=\/dev\/sda3:cryptboot/' \
+    "${LUKS}" && sed -i 's/rw  quiet/rw cryptdevice=\/dev\/sda3:cryptboot/' \
 	    /boot/grub/grub.cfg
 
     grub-install "${HD}"
@@ -307,8 +307,8 @@ install()
     wprintf "[+] Configure system users..."
     configure_users
 
-    ${LUKS} && wprintf "[+] Re-Generating initfs..."
-    ${LUKS} && generate_initfs
+    "${LUKS}" && wprintf "[+] Re-Generating initfs..."
+    "${LUKS}" && generate_initfs
 
     wprintf "[+] Setting blackarch hostname..."
     hostname blackarch

@@ -47,6 +47,9 @@ MENU_BLACKMAN="3"
 # luks global var
 LUKS="false"
 
+# swap global var
+SWAP="false"
+
 # blackarchinstall version
 VERSION="v0.6.3beta1"
 
@@ -194,15 +197,21 @@ check_mkfs_status()
 format_partition()
 {
 
-    printf "[+] Create new partitions with cfdisk [only boot and root]\n"
+    printf "[+] Create new partitions with cfdisk [boot, root and optional Swap]\n"
     sleep 2
     cfdisk "${HD}"
     printf "    -> Number of the Boot partition created [1]: "
     read a; [ "${a}" != "" ] && boot_part="${HD}${a}"
     printf "    -> Type of Boot partition [ext2]: "
     read a; [ "${a}" != "" ] && boot_type="${a}"
-    printf "    -> Number of the Swap partition created [2]:"
-    read a; [ "${a}" != "" ] && swap_part="${a}"
+
+    printf "[?] Did you create Swap partition? [y/N]: "; read a
+    if [ "${a}" == "y" ] || [ "${a}" == "Y" ]; then
+        SWAP="true"
+        printf "    -> Number of the Swap partition created [2]:"
+        read a; [ "${a}" != "" ] && swap_part="${a}"
+    fi
+
     printf "    -> Number of the Root partition created [3]: "
     read a; [ "${a}" != "" ] && root_part="${HD}${a}"
     printf "    -> Type of Root partition [ext4]: "
@@ -212,7 +221,7 @@ format_partition()
     printf "%s" "${RED}"
     printf "\n[!!] About to create and format partitions:\n"
     printf "    -> /boot %s with type %s\n" "${boot_part}" "${boot_type}"i
-    printf "    -> Swap  %s with type Swap\n" "${swap_part}"
+    "${SWAP}" && printf "    -> Swap  %s with type Swap\n" "${swap_part}"
     printf "    -> /     %s with type %s\n" "${root_part}" "${root_type}"
     printf "Are you sure? [y/N]: "; read a
     [ "${a}" == "y" ] || [ "${a}" == "Y" ] && printf "   - R3ally? ;) \n[y/N]: "; read a
@@ -221,7 +230,7 @@ format_partition()
     if [ "${a}" == "y" ] || [ "${a}" == "Y" ]; then
         "mkfs.${boot_type}" -L boot "${boot_part}"; check_mkfs_status
         "mkfs.${root_type}" -L root "${root_part}"; check_mkfs_status
-        "mkfswap ${swap_part}"; check_mkfs_status
+        "${SWAP}" && "mkfswap ${swap_part}"; check_mkfs_status
     else
         # go back to setup up filesystem
         setup_filesystem
@@ -266,7 +275,7 @@ setup_filesystem()
 mount_filesystem()
 {
     mkdir -p "${ROOT}"
-    if ${LUKS}; then
+    if "${LUKS}"; then
 	    mount -t "${root_type}" /dev/mapper/cryptroot "${ROOT}"
     else
 	    mount -t "${root_type}" "${root_part}" "${ROOT}"
@@ -275,7 +284,7 @@ mount_filesystem()
     mkdir -p "${ROOT}/boot"
     mount -t "${boot_type}" "${boot_part}" "${ROOT}/boot"
 
-    swapon ${swap_part}
+    "${SWAP}" && swapon "${swap_part}"
 
     return "${SUCCESS}"
 }
