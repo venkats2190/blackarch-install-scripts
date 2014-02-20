@@ -253,8 +253,23 @@ format_partition()
     printf "%s" "${WHITE}"
 
     if [ "${a}" == "y" ] || [ "${a}" == "Y" ]; then
+        # * BOOT
         "mkfs.${boot_type}" -L boot "${boot_part}"; check_mkfs_status
-        "mkfs.${root_type}" -L root "${root_part}"; check_mkfs_status
+        # * ROOT
+        if ${LUKS}; then
+            #Format and encrypt ROOT partition
+            printf "[+] Formatting ROOT partiton, please type your passphrase for encryption : \n"
+            cryptsetup -y -v luksFormat "${root_part}"
+            printf "[+] Openning encrypted partition, re-enter your passphrase : \n"
+            cryptsetup open "${root_part}" cryptroot
+            "mkfs.${root_type}" -L root "/dev/mapper/cryptroot"; check_mkfs_status
+            printf "[+] Created root encrypted partition: /dev/mapper/cryptroot - ext4\n"
+
+        else
+            "mkfs.${root_type}" -L root "${root_part}"; check_mkfs_status
+            printf "[+] Created root partition: %s - ext4\n" "${root_part}"
+        fi
+        # * SWAP
         if "${SWAP}"; then "mkfswap ${swap_part}"; check_mkfs_status; fi
     else
         cri "No format no fun"
