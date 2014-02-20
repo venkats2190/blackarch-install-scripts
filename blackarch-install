@@ -24,17 +24,6 @@ SEC_ENABLE="false"
 # root variable
 ROOT="/mnt/blackarch"
 
-# Defaults Partitioning
-HD="/dev/sda"
-boot_part="${HD}1"
-boot_type="ext2"
-boot_size="100MB"
-root_part="${HD}3"
-root_type="ext4"
-root_size="10GB"
-swap_part="${HD}2"
-swap_size="1024MB"
-
 # Partition CONST
 PART_AUTO="1"
 PART_MANUAL="2"
@@ -196,23 +185,29 @@ check_mkfs_status()
 
 format_partition()
 {
+    default_part="1"
+
+    printf "%s" "${WHITE}"
 
     printf "[+] Create new partitions with cfdisk [boot, root and optional Swap]\n"
-    sleep 2
+    sleep 5
     cfdisk "${HD}"
-    printf "    -> Number of the Boot partition created [1]: "
+    printf "    -> Number of the Boot partition created [%s]: " "${default_part}"
     read a; [ "${a}" != "" ] && boot_part="${HD}${a}"
     printf "    -> Type of Boot partition [ext2]: "
     read a; [ "${a}" != "" ] && boot_type="${a}"
 
+    $((default_part++))
+
     printf "[?] Did you create Swap partition? [y/N]: "; read a
     if [ "${a}" == "y" ] || [ "${a}" == "Y" ]; then
         SWAP="true"
-        printf "    -> Number of the Swap partition created [2]:"
+        printf "    -> Number of the Swap partition created [%s]:" "${default_part}"
         read a; [ "${a}" != "" ] && swap_part="${a}"
+        $((default_part++))
     fi
 
-    printf "    -> Number of the Root partition created [3]: "
+    printf "    -> Number of the Root partition created [%s]: " "${default_part}"
     read a; [ "${a}" != "" ] && root_part="${HD}${a}"
     printf "    -> Type of Root partition [ext4]: "
     read a; [ "${a}" != "" ] && boot_type="${a}"
@@ -237,6 +232,8 @@ format_partition()
         return "${SUCCESS}"
     fi
 
+    printf "%s" "${NC}"
+
     return "${SUCCESS}"
 }
 
@@ -244,7 +241,7 @@ ask_for_luks()
 {
     printf "%s" "${WHITE}"
     # user input for luks
-    printf "[+] Do you want full encrypted root? [y/N]:"; read a;
+    printf "[+] Do you want full encrypted root? [y/N]: "; read a;
 
     if [ "${a}" == "y" ] || [ "${a}" == "Y" ]; then
         LUKS="true"
@@ -258,14 +255,28 @@ ask_for_luks()
 setup_filesystem()
 {
     printf "%s" "${WHITE}"
-    # user input settings
-    printf "[+] Type the device for install [%s]: " "${HD}"
-    read a; [ "${a}" != "" ] && HD=${a} # sanitize input
+
+    # force user to set device to format
+    unset a
+    while [ -z "${a}" ]; do
+        printf "[+] Type the device for install [/dev/sdX]: " "${HD}"; read a;
+        if [ "${a}" != "" ]; then
+            HD=${a} # sanitize input
+            break
+        fi
+    done
 
     printf "    -> Hard Drive Selected: %s\n" "${HD}"
 
-    # partitioning
-    format_partition
+    # Set up defaults partitioning vars
+    boot_part="${HD}1"
+    boot_type="ext2"
+    boot_size="100MB"
+    swap_part="${HD}2"
+    swap_size="1024MB"
+    root_part="${HD}3"
+    root_type="ext4"
+    root_size="10GB"
 
     printf "%s" "${NC}"
 
@@ -361,7 +372,10 @@ install()
 
     wprintf "[+] Hard drive configuration..."
     ask_for_luks
+    # set HD and defaults
     setup_filesystem
+    # start partitioning
+    format_partition
 
     wprintf "[+] Mounting filesystem..."
     mount_filesystem
