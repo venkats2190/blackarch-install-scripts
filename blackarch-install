@@ -195,7 +195,7 @@ format_partition()
     default_part="1"
 
     # cfdisk partitioning
-    wprintf "[+] Create new partitions with cfdisk [boot, root and optional Swap]\n"
+    wprintf "[+] Create new partitions with cfdisk %s[boot, root and optional Swap]" "${RED}"
     sleep 5
     cfdisk "${HD}"
     [ "${?}" != "0" ] && cri "Error with cfdisk - run install again"
@@ -245,7 +245,7 @@ format_partition()
     # about to format
     printf "%s" "${RED}"
     printf "\n[!!] About to create and format partitions:\n"
-    printf "    -> /boot %s with type %s\n" "${boot_part}" "${boot_type}"i
+    printf "    -> /boot %s with type %s\n" "${boot_part}" "${boot_type}"
     "${SWAP}" && printf "    -> Swap  %s with type Swap\n" "${swap_part}"
     printf "    -> /     %s with type %s\n" "${root_part}" "${root_type}"
     printf "Are you sure? [y/N]: "; read a
@@ -255,11 +255,9 @@ format_partition()
     if [ "${a}" == "y" ] || [ "${a}" == "Y" ]; then
         "mkfs.${boot_type}" -L boot "${boot_part}"; check_mkfs_status
         "mkfs.${root_type}" -L root "${root_part}"; check_mkfs_status
-        "${SWAP}" && "mkfswap ${swap_part}"; check_mkfs_status
+        if "${SWAP}"; then "mkfswap ${swap_part}"; check_mkfs_status; fi
     else
-        # go back to setup up filesystem
-        setup_filesystem
-        return "${SUCCESS}"
+        cri "No format no fun"
     fi
 
     printf "%s" "${NC}"
