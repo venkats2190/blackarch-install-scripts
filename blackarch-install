@@ -33,6 +33,13 @@ MENU_LIVE="1"
 MENU_REPO="2"
 MENU_BLACKMAN="3"
 
+# Set up defaults partitioning vars
+boot_type="ext2"
+boot_size="100MB"
+swap_size="1024MB"
+root_type="ext4"
+root_size="10GB"
+
 # luks global var
 LUKS="false"
 
@@ -187,30 +194,53 @@ format_partition()
 {
     default_part="1"
 
-    printf "%s" "${WHITE}"
-
-    printf "[+] Create new partitions with cfdisk [boot, root and optional Swap]\n"
+    # cfdisk partitioning
+    wprintf "[+] Create new partitions with cfdisk [boot, root and optional Swap]\n"
     sleep 5
     cfdisk "${HD}"
-    printf "    -> Number of the Boot partition created [%s]: " "${default_part}"
-    read a; [ "${a}" != "" ] && boot_part="${HD}${a}"
+    [ "${?}" != "0" ] && cri "Error with cfdisk - run install again"
+
+    printf "%s" "${WHITE}"
+
+    # * BOOT
+    printf "    -> Number of the Boot partition created [%s]: " \
+        "${default_part}"; read a;
+    if [ "${a}" != "" ]; then
+        boot_part="${HD}${a}";
+    else
+        boot_part="${HD}${default_part}"
+    fi
+
     printf "    -> Type of Boot partition [ext2]: "
     read a; [ "${a}" != "" ] && boot_type="${a}"
 
-    $((default_part++))
+    ((default_part++))
 
+    # * SWAP
     printf "[?] Did you create Swap partition? [y/N]: "; read a
     if [ "${a}" == "y" ] || [ "${a}" == "Y" ]; then
         SWAP="true"
-        printf "    -> Number of the Swap partition created [%s]:" "${default_part}"
-        read a; [ "${a}" != "" ] && swap_part="${a}"
-        $((default_part++))
+        printf "    -> Number of the Swap partition created [%s]:" \
+            "${default_part}"; read a
+        if [ "${a}" != "" ]; then
+            swap_part="${a}"
+        else
+            swap_part="${default_part}"
+        fi
+        ((default_part++))
     fi
 
-    printf "    -> Number of the Root partition created [%s]: " "${default_part}"
-    read a; [ "${a}" != "" ] && root_part="${HD}${a}"
+    # * ROOT
+    printf "    -> Number of the Root partition created [%s]: " \
+        "${default_part}"; read a
+    if [ "${a}" != "" ]; then
+        root_part="${HD}${a}"
+    else
+        root_part="${HD}${default_part}"
+    fi
     printf "    -> Type of Root partition [ext4]: "
     read a; [ "${a}" != "" ] && boot_type="${a}"
+
 
     # about to format
     printf "%s" "${RED}"
@@ -267,16 +297,6 @@ setup_filesystem()
     done
 
     printf "    -> Hard Drive Selected: %s\n" "${HD}"
-
-    # Set up defaults partitioning vars
-    boot_part="${HD}1"
-    boot_type="ext2"
-    boot_size="100MB"
-    swap_part="${HD}2"
-    swap_size="1024MB"
-    root_part="${HD}3"
-    root_type="ext4"
-    root_size="10GB"
 
     printf "%s" "${NC}"
 
