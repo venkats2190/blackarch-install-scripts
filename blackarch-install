@@ -17,7 +17,7 @@
 #                                                                              #
 ################################################################################
 
-# SECURITY VAR - this version can rm -rf /* your hard drive
+# SECURITY VAR - for beta version that can rm -rf /* your hard drive
 SEC_ENABLE="false"
 
 
@@ -258,13 +258,12 @@ format_partition()
         # * ROOT
         if ${LUKS}; then
             #Format and encrypt ROOT partition
-            printf "[+] Formatting ROOT partiton, please type your passphrase for encryption : \n"
+            printf "[+] Formatting ROOT partiton, please type your passphrase for encryption: \n"
             cryptsetup -y -v luksFormat "${root_part}"
-            printf "[+] Openning encrypted partition, re-enter your passphrase : \n"
+            printf "[+] Openning encrypted partition, re-enter your passphrase: \n"
             cryptsetup open "${root_part}" cryptroot
             "mkfs.${root_type}" -L root "/dev/mapper/cryptroot"; check_mkfs_status
             printf "[+] Created root encrypted partition: /dev/mapper/cryptroot - ext4\n"
-
         else
             "mkfs.${root_type}" -L root "${root_part}"; check_mkfs_status
             printf "[+] Created root partition: %s - ext4\n" "${root_part}"
@@ -362,7 +361,7 @@ install_chroot()
     mount --rbind /dev "${ROOT}/dev"
     mount --rbind /sys "${ROOT}/sys"
 
-    chroot "${ROOT}" "/bin/chroot-install" "${mode}" -d "${HD}" "$(${LUKS} && printf '-L')"
+    chroot "${ROOT}" "/bin/chroot-install" "${mode}" -D "${HD}" -R "${root_part}" "$(${LUKS} && printf '-L')"
 
     # cleaning up
     rm -rf "${ROOT}/bin/${chroot_file}"
@@ -491,10 +490,6 @@ get_opts()
     while getopts vVH flags
     do
         case "${flags}" in
-            #i)
-            #    #optarg=${OPTARG}
-            #    opt="install"
-            #    ;;
             v)
                 VERBOSE="/dev/stdout"
                 ;;
