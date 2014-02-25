@@ -223,9 +223,9 @@ format_partition()
         printf "    -> Number of the Swap partition created [%s]:" \
             "${default_part}"; read a
         if [ "${a}" != "" ]; then
-            swap_part="${a}"
+            swap_part="${HD}${a}"
         else
-            swap_part="${default_part}"
+            swap_part="${HD}${default_part}"
         fi
         ((default_part++))
     fi
@@ -319,6 +319,7 @@ mount_filesystem()
 {
     mkdir -p "${ROOT}"
     if "${LUKS}"; then
+        # TODO: make /dev/mapper/crytroot variable for later chroot -R
 	    mount -t "${root_type}" /dev/mapper/cryptroot "${ROOT}"
     else
 	    mount -t "${root_type}" "${root_part}" "${ROOT}"
@@ -337,7 +338,7 @@ install_base_packages()
     wprintf "  --> ArchLinux Base"
     pacstrap -c "${ROOT}" base
 
-    [ ${?} != "0" ] && cri "Failed to install ArchLinux base packages"
+    [ "${?}" != "0" ] && cri "Failed to install ArchLinux base packages"
 
     return "${SUCCESS}"
 }
@@ -361,7 +362,7 @@ install_chroot()
     mount --rbind /dev "${ROOT}/dev"
     mount --rbind /sys "${ROOT}/sys"
 
-    chroot "${ROOT}" "/bin/chroot-install" "${mode}" -D "${HD}" -R "${root_part}" "$(${LUKS} && printf '-L')"
+    chroot "${ROOT}" "/bin/chroot-install" "${mode}" -D "${HD}" -R "${root_part}" "$(${LUKS} && printf '%sL' '-')"
 
     # cleaning up
     rm -rf "${ROOT}/bin/${chroot_file}"
