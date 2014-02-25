@@ -210,7 +210,7 @@ install_grub()
     printf 'GRUB_BACKGROUND="/boot/grub/splash.png"\n' >> /etc/default/grub
 
     grub-mkconfig -o /boot/grub/grub.cfg
-    sed -i 's/Arch Linux.*/BlackArch Linux/' \
+    sed -i 's/Arch Linux/BlackArch Linux/' \
         /boot/grub/grub.cfg
     "${LUKS}" && sed -i "s?rw  quiet?rw cryptdevice=${ROOT_PART}:cryptboot?" \
 	    /boot/grub/grub.cfg
