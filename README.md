@@ -3,8 +3,60 @@ Blackarch Install
 
 Install From ArchLinux/BlackArch Live-ISO-DVD/BlackArch NetInstall
 ----------------------------------------------------------------
-Version: 0.5.x (See Github Tags)
+Version: 0.7 (See Github Tags and Changelog)
 
+    1. # blackarch-install
+    2. Select Install Mode:
+        1. Install from Live-ISO.
+            - It will dump the current Live image into your hard drive.
+        2. Install from BlackArch Official Repository.
+            - It will install base system from Arch Linux and
+            add Black Arch Linux packages from the official repository
+            into your hard drive. You can choose the packets to install.
+        3. Install from Blackman.
+            - It will install base system from Arch Linux and
+            will download and compile all the BlackArch Linux packages
+            from their source according to PKGBULD files.
+    3. Encryption:
+        3.1. If 'y' selected, root partition will be encrypted with
+            cryptsetup. After Partitioning, you will be asked for luks
+            password.
+    4. Partitioning:
+        4.1. Set the device you want to install BlackArch Linux in.
+        4.2. Choose Partition Mode:
+            * Only /boot, / root, and Swap [optional] partition are supported.
+            - Set manual partitions with cfdisk and format them.
+                - This mode will run cfdisk utility for partition creation.
+                Once you have set up your proper /boot and / root partition,
+                dont forget to *Write* and you are good to go.
+                It will ask you when 'Quit' for the /boot and / root partition
+                number chosed, also the partition type is required for
+                format purposes. [remember Swap is an optional choice]
+    5. Select BlackArch Repository;
+        - BlackArch Official Repositories list is displayed, just choose
+          blackarch repo number according to your location.
+    6. Install:
+        - BlackArch Linux will be now installed into your hard drive.
+          This will take a while.
+    7. Setup up root password.
+    8. Setup normal user account (optional).
+    9. Grub install (automatic)
+    10. Reboot and enjoy your BlackArch distro.
+
+
+
+
+Old Stuff
+---------
+
+Install From ArchLinux - v0.6 Release (See Github Tags)
+--------------------------------------------------------
+    - Mirror option added.
+    * See Changelog and v0.7 ;)
+
+
+Install From ArchLinux - v0.5.x Release (See Github Tags)
+--------------------------------------------------------
     1. # blackarch-install
     2. Select Install Mode:
         1. Install from Live-ISO.
