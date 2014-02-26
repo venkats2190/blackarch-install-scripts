@@ -15,6 +15,9 @@
 # AUTHOR                                                                       #
 # nrz@nullsecurity.net                                                         #
 #                                                                              #
+# CONTRIBUTORS                                                                 #
+# pierre@pi3rrot.net                                                           #
+#                                                                              #
 ################################################################################
 
 # SECURITY VAR - for beta version that can rm -rf /* your hard drive
@@ -47,7 +50,7 @@ LUKS="false"
 SWAP="false"
 
 # blackarchinstall version
-VERSION="v0.6.3beta1"
+VERSION="v0.7"
 
 # true / false
 FALSE="0"
