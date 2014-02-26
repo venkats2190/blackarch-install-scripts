@@ -17,3 +17,9 @@ v0.4
 v0.5
 	-> Partition mode
 		-> Manual mode implemented
+v0.6
+	-> Mirror feature
+		-> Dynamic choose for BlackArch mirrors
+v0.7
+	-> Cryptsetup
+		-> added crypto option for root device
