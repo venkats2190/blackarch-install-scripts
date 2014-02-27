@@ -164,10 +164,6 @@ update_system()
         fi
     fi
 
-    if [ -n "${LIVE}" ]; then
-        curl -s http://blackarch.org/strap.sh | sh
-    fi
-
     pacman -Syy --noconfirm "${LIVE+-u}"
 
     return "${SUCCESS}"
