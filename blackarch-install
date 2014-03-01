@@ -171,14 +171,14 @@ update_system()
 
 check_parted_status()
 {
-    [ ${?} != "0" ] && cri "Something wrong with parted - If you plan to run install script again, delete first all partitions created before error"
+    [ "${?}" != "0" ] && cri "Something wrong with parted - If you plan to run install script again, delete first all partitions created before error"
 
     return "${SUCCESS}"
 }
 
 check_mkfs_status()
 {
-    [ ${?} != "0" ] && cri "Something wrong with mkfs"
+    [ "${?}" != "0" ] && cri "Something wrong with mkfs"
 
     return "${SUCCESS}"
 }
