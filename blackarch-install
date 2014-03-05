@@ -341,7 +341,7 @@ install_base_packages()
     return "${SUCCESS}"
 }
 
-install_chroot()
+install_chroot_script()
 {
     mode=${1}
 
@@ -391,10 +391,10 @@ dump_live()
     return "${SUCCESS}"
 }
 
-install()
+run_chroot_script()
 {
     # if live not need to do this
-    if [ "${menu_opt}" != "${MENU_LIVE}" ]; then
+    if [ "${menu_opt_how}" != "${MENU_LIVE}" ]; then
         wprintf "[+] Generating pacman.conf"
         cp -Rf /etc/pacman* "${ROOT}/etc/"
 
@@ -413,15 +413,15 @@ install()
     # setup hostname
     sed -i 's/localhost/blackarch/g' "${ROOT}/etc/hosts"
 
-    case "${menu_opt}" in
+    case "${menu_opt_how}" in
         "${MENU_LIVE}")
-            install_chroot "-l"
+            install_chroot_script "-l"
             ;;
         "${MENU_REPO}")
-            install_chroot "-r"
+            install_chroot_script "-r"
             ;;
         "${MENU_BLACKMAN}")
-            install_chroot "-b"
+            install_chroot_script "-b"
             ;;
     esac
 
@@ -470,6 +470,8 @@ install_drive()
 
 install_chroot()
 {
+    menu_opt_how=$1
+
     # -pcvzf
     bootstrap_32="http://mirror.aarnet.edu.au/pub/archlinux/iso/2014.03.01/archlinux-bootstrap-2014.03.01-i686.tar.gz"
     bootstrap_64="http://mirror.aarnet.edu.au/pub/archlinux/iso/2014.03.01/archlinux-bootstrap-2014.03.01-x86_64.tar.gz"
@@ -580,9 +582,9 @@ main()
         install_menu_where
         install_menu_how
         if [ "${menu_opt_where}" == "${MENU_DRIVE}" ]; then
-            install_drive "${menu_opt}"
+            install_drive "${menu_opt_how}"
         else
-            install_chroot "${menu_opt}"
+            install_chroot "${menu_opt_how}"
         fi
     else
         cri "SEC_ENABLE var active - vim blackarch-install"
