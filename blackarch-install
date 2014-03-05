@@ -586,6 +586,7 @@ main()
         else
             install_chroot "${menu_opt_how}"
         fi
+        run_chroot_script
     else
         cri "SEC_ENABLE var active - vim blackarch-install"
     fi
