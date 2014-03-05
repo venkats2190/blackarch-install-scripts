@@ -25,13 +25,17 @@ SEC_ENABLE="false"
 
 
 # root variable
-ROOT="/mnt/blackarch"
+ROOT="/tmp/blackarch"
 
 # Partition CONST
 PART_AUTO="1"
 PART_MANUAL="2"
 
-# Menu CONST
+# Menu where CONST
+MENU_DRIVE="1"
+MENU_CHROOT="2"
+
+# Menu How CONST
 MENU_LIVE="1"
 MENU_REPO="2"
 MENU_BLACKMAN="3"
@@ -389,33 +393,6 @@ dump_live()
 
 install()
 {
-    menu_opt=${1}
-
-    # live flag for update system
-    [ "${menu_opt}" == "${MENU_LIVE}" ] && LIVE="true"
-
-    wprintf "[+] Updating system..."
-    update_system
-
-    wprintf "[+] Hard drive configuration..."
-    ask_for_luks
-    # set HD and defaults
-    setup_filesystem
-    # start partitioning
-    format_partition
-
-    wprintf "[+] Mounting filesystem..."
-    mount_filesystem
-
-    # if live dump everything
-    [ "${menu_opt}" == "${MENU_LIVE}" ] && dump_live
-
-    wprintf "[+] Installing packages..."
-    install_base_packages
-
-    wprintf "[+] Generating fstab..."
-    genfstab -p "${ROOT}" >> "${ROOT}/etc/fstab"
-
     # if live not need to do this
     if [ "${menu_opt}" != "${MENU_LIVE}" ]; then
         wprintf "[+] Generating pacman.conf"
@@ -423,14 +400,6 @@ install()
 
         wprintf "[+] Generating resolv.conf"
         cp /etc/resolv.conf "${ROOT}/etc/"
-    fi
-
-    wprintf "[+] Setting up grub config..."
-    if [ -d grub ]; then
-        cp grub/splash.png "${ROOT}/boot/"
-    else
-        # we are a blackarch package installed
-        cp /usr/share/blackarch-install-scripts/grub/splash.png "${ROOT}/boot/"
     fi
 
     wprintf "[+] Installing chroot system..."
@@ -456,27 +425,119 @@ install()
             ;;
     esac
 
+}
+
+install_drive()
+{
+    menu_opt_how=${1}
+
+    # live flag for update system
+    [ "${menu_opt_how}" == "${MENU_LIVE}" ] && LIVE="true"
+
+    wprintf "[+] Updating system..."
+    update_system
+
+    wprintf "[+] Hard drive configuration..."
+    ask_for_luks
+    # set HD and defaults
+    setup_filesystem
+    # start partitioning
+    format_partition
+
+    wprintf "[+] Mounting filesystem..."
+    mount_filesystem
+
+    wprintf "[+] Installing packages..."
+    install_base_packages
+
+    wprintf "[+] Generating fstab..."
+    genfstab -p "${ROOT}" >> "${ROOT}/etc/fstab"
+
+    wprintf "[+] Setting up grub config..."
+    if [ -d grub ]; then
+        cp grub/splash.png "${ROOT}/boot/"
+    else
+        # we are a blackarch package installed
+        cp /usr/share/blackarch-install-scripts/grub/splash.png "${ROOT}/boot/"
+    fi
+
+    # if live dump everything
+    [ "${menu_opt_how}" == "${MENU_LIVE}" ] && dump_live
+
+
     return "${SUCCESS}"
 }
 
-install_menu()
+install_chroot()
+{
+    # -pcvzf
+    bootstrap_32="http://mirror.aarnet.edu.au/pub/archlinux/iso/2014.03.01/archlinux-bootstrap-2014.03.01-i686.tar.gz"
+    bootstrap_64="http://mirror.aarnet.edu.au/pub/archlinux/iso/2014.03.01/archlinux-bootstrap-2014.03.01-x86_64.tar.gz"
+    mkdir -p bootstrap; cd bootstrap
+    case "$(uname -m)" in
+        "i686")
+            # fix this
+            ! [ -f "archlinux-bootstrap*" ] &&
+            wget "${bootstrap_32}"
+            ;;
+        "x86_64")
+            # fix this
+          ! [ -f "blackarch_x86_64.tar.gz" ] &&
+            wget "${bootstrap_64}"
+            ;;
+    esac
+
+    mkdir -p "${ROOT}"
+
+    # fix this
+    tar -zxvf blackarch_x86_64.tar.gz -C "${ROOT}"
+
+    # if live dump everything
+    [ "${menu_opt_how}" == "${MENU_LIVE}" ] && dump_live
+
+    return "${SUCCESS}"
+}
+
+install_menu_how()
 {
     printf "%s" "${WHITE}"
-    while ! [ "${menu_opt}" == "${MENU_LIVE}" \
-           -o "${menu_opt}" == "${MENU_REPO}" \
-           -o "${menu_opt}" == "${MENU_BLACKMAN}" ]; do
+    while ! [ "${menu_opt_how}" == "${MENU_LIVE}" \
+           -o "${menu_opt_how}" == "${MENU_REPO}" \
+           -o "${menu_opt_how}" == "${MENU_BLACKMAN}" ]; do
 
         printf "[+] Select Install Mode:\n"
         printf "    1. Install from Live-ISO.\n"
         printf "    2. Install from BlackArch Official Repository.\n"
         printf "    3. Install from Blackman.\n"
-        printf "Make a choice: "; read menu_opt
+        printf "Make a choice: "; read menu_opt_how
     done
 
     printf "%s" "${NC}"
 
     return "${SUCCESS}"
 }
+
+install_menu_where()
+{
+    printf "%s" "${WHITE}"
+    while ! [ "${menu_opt_where}" == "${MENU_DRIVE}" \
+           -o "${menu_opt_where}" == "${MENU_CHROOT}" ]; do
+        printf "[+] Where to install BlackArch:\n"
+        printf "    1. Install into Drive.\n"
+        printf "    2. Install into chroot from existing linux.\n"
+        printf "Make a choice: "; read menu_opt_where
+    done
+
+    if [ "${menu_opt_where}" == "${MENU_CHROOT}" ]; then
+        printf "[?] Directory to make chroot [%s]: " "${ROOT}"
+        read a; [ "${a}" != "" ] && ROOT="${a}"
+    fi
+
+    printf "%s" "${NC}"
+
+    return "${SUCCESS}"
+}
+
 
 
 # parse command line options
@@ -515,8 +576,14 @@ main()
 
     # commented arg opt
     if [[ "${SEC_ENABLE}" == "false" ]]; then
-        install_menu
-        install "${menu_opt}"
+        clear
+        install_menu_where
+        install_menu_how
+        if [ "${menu_opt_where}" == "${MENU_DRIVE}" ]; then
+            install_drive "${menu_opt}"
+        else
+            install_chroot "${menu_opt}"
+        fi
     else
         cri "SEC_ENABLE var active - vim blackarch-install"
     fi
