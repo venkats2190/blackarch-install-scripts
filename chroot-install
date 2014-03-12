@@ -249,7 +249,7 @@ configure_users()
     cp /root/.bashrc /root/.bash_profile
 
     printf "[+] Do you want to setup a normal user account [y/N]: "; read a
-    if [ "${a}" == "y" ] || [ "${a}" == "Y"]; then
+    if [ "${a}" == "y" ] || [ "${a}" == "Y" ]; then
         printf "[+] User name: "; read user
         useradd -m -p "" -g users \
             -G "adm,audio,floppy,log,network,rfkill,scanner,storage,optical,power,wheel" \
