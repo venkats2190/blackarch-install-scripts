@@ -246,6 +246,10 @@ format_partition()
     [ "${a}" == "y" ] || [ "${a}" == "Y" ] && printf "   - R3ally? ;) \n[y/N]: "; read a
     printf "%s" "${WHITE}"
 
+    # safety checks
+    umount "${boot_part}" &> /dev/null
+    umount "${root_part}" &> /dev/null
+
     if [ "${a}" == "y" ] || [ "${a}" == "Y" ]; then
         # * BOOT
         "mkfs.${boot_type}" -L boot "${boot_part}"; check_mkfs_status
