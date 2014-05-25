@@ -1,10 +1,9 @@
-[ ] Keyboard layout
+[X] Keyboard layout
 [X] Set user options for partitions
 [X] Cryptosetup
 [ ] Install mode - No user interaction - Yes to all
 [X] 3 Install Choices
-[ ] Refactoring
-[ ] Configure hostname
+[X] Configure hostname
 [ ] Solution when packets install fails - connection reasons
 [X] Add check if root/user passwd fails
 [X] Add mirrorlist generator support + rankmirror call based on user's country code enter.
