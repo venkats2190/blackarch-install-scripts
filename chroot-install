@@ -279,6 +279,23 @@ generate_initfs()
     return "${SUCCESS}"
 }
 
+set_hostname()
+{
+
+    printf "%s" "${WHITE}"
+
+    printf " -> Set hostname [blackarch]: "
+    read hostname
+
+    [ "${hostname}" == "" ] && hostname="blackarch"
+
+    hostnamectl set-hostname "${hostname}"
+
+    printf "%s" "${NC}"
+
+    return "${SUCCESS}"
+}
+
 install()
 {
     menu_opt=${1}
@@ -306,7 +323,7 @@ install()
     "${LUKS}" && generate_initfs
 
     wprintf "[+] Setting blackarch hostname..."
-    hostname blackarch
+    set_hostname
 
     wprintf "[+] Installing grub..."
     install_grub
