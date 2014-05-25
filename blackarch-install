@@ -169,6 +169,39 @@ update_system()
     return "${SUCCESS}"
 }
 
+set_keymaps()
+{
+    printf "%s" "${WHITE}"
+
+    locale-gen &> /dev/null
+
+    while true; do
+        printf "    1. Set keymaps.\n"
+        printf "    2. See available keymaps.\n"
+        printf "Select: "; read keymaps_opt
+        [ "${keymaps_opt}" == "1" ] && break
+        if [ "${keymaps_opt}" == "2" ]; then
+            printf "%s" "${NC}"
+            localectl list-keymaps
+            clear
+            printf "%s" "${WHITE}"
+        fi
+    done
+
+    printf " -> Set keymaps [us]: "
+    read keymaps
+
+    [ "${keymaps}" == "" ] && keymaps="us"
+
+    localectl set-keymap --no-convert "${keymaps}"
+    loadkeys "${keymaps}"
+
+    printf "%s" "${NC}"
+
+    return "${SUCCESS}"
+}
+
+
 check_parted_status()
 {
     [ "${?}" != "0" ] && cri "Something wrong with parted - If you plan to run install script again, delete first all partitions created before error"
@@ -360,7 +393,8 @@ install_chroot()
     mount --rbind /dev "${ROOT}/dev"
     mount --rbind /sys "${ROOT}/sys"
 
-    chroot "${ROOT}" "/bin/chroot-install" "${mode}" -D "${HD}" -R "${root_part}" "$(${LUKS} && printf '%sL' '-')"
+    chroot "${ROOT}" "/bin/chroot-install" "${mode}" \
+        -D "${HD}" -R "${root_part}" -k "${keymaps}" "$(${LUKS} && printf '%sL' '-')"
 
     # cleaning up
     rm -rf "${ROOT}/bin/${chroot_file}"
@@ -397,6 +431,9 @@ install()
 
     # live flag for update system
     [ "${menu_opt}" == "${MENU_LIVE}" ] && LIVE="true"
+
+    wprintf "[+] Setting keymaps..."
+    set_keymaps
 
     wprintf "[+] Updating system..."
     update_system

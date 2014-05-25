@@ -325,6 +325,11 @@ install()
     wprintf "[+] Setting blackarch hostname..."
     set_hostname
 
+    # set keymaps choosed before silently
+    locale-gen &> /dev/null
+    localectl set-keymap --no-convert "${KEYMAPS}"
+    loadkeys "${KEYMAPS}"
+
     wprintf "[+] Installing grub..."
     install_grub
 
@@ -340,7 +345,7 @@ install()
 # parse command line options
 get_opts()
 {
-    while getopts lrbD:R:LvVH flags
+    while getopts lrbD:R:Lk:vVH flags
     do
         case "${flags}" in
             l)
@@ -360,6 +365,9 @@ get_opts()
                 ;;
             L)
                 LUKS="true"
+                ;;
+            k)
+                KEYMAPS=${OPTARG}
                 ;;
             v)
                 VERBOSE="/dev/stdout"
