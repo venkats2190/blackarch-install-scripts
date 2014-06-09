@@ -289,7 +289,7 @@ set_hostname()
 
     [ "${hostname}" == "" ] && hostname="blackarch"
 
-    hostnamectl set-hostname "${hostname}"
+    printf "%s\n" "${hostname}" > /etc/hostname
 
     printf "%s" "${NC}"
 
