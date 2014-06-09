@@ -326,9 +326,7 @@ install()
     set_hostname
 
     # set keymaps choosed before silently
-    locale-gen &> /dev/null
-    localectl set-keymap --no-convert "${KEYMAPS}"
-    loadkeys "${KEYMAPS}"
+    printf "KEYMAP=%s\n" "${KEYMAPS}" > /etc/vconsole.conf
 
     wprintf "[+] Installing grub..."
     install_grub
