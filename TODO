@@ -1,15 +1,16 @@
+[ ] Installation Resume
+[ ] Clean up on failure -  it doesn't unmount or run cryptsetup close on failure
+[ ] Add arch mirrorlist generator support + rankmirror call based on user's country code enter
+[ ] Solution when packets install fails - connection reasons
+[ ] Add quiet mode option / progressbar of installation
+[ ] Install mode - No user interaction - Yes to all
 [X] Keyboard layout
 [X] Set user options for partitions
 [X] Cryptosetup
-[ ] Install mode - No user interaction - Yes to all
 [X] 3 Install Choices
 [X] Configure hostname
-[ ] Solution when packets install fails - connection reasons
 [X] Add check if root/user passwd fails
 [X] Add mirrorlist generator support + rankmirror call based on user's country code enter.
-[ ] Add arch mirrorlist generator support + rankmirror call based on user's country code enter
-[ ] Add quiet mode option / progressbar of installation
 [X] Check grub config: wrong label for blackarch entries
 [X] pacman.conf fix: remove multiple [multilib] entries.
 [X] Fix keyring URL
-[ ] Clean up on failure -  it doesn't unmount or run cryptsetup close on failure
