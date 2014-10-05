@@ -34,7 +34,7 @@ FAILURE=31337
 VERBOSE="/dev/null"
 
 # blackarch-install version
-VERSION="v0.7.7"
+VERSION="v0.7.8"
 
 # colors
 WHITE="$(tput bold ; tput setaf 7)"
@@ -367,21 +367,21 @@ set_hostname()
 
 
 # configure X related things
-configure_X()
-{
+#configure_X()
+#{
     # enable display manager
-    systemctl enable lxdm
+    #systemctl enable lxdm
 
     # WMs
-    cp -r /usr/share/fluxbox-blackarch/* /usr/share/fluxbox
-    cp /etc/xdg/awesome/rc.lua.blackarch /etc/xdg/awesome/rc.lua
-    cp -r /etc/xdg/openbox-blackarch/* /etc/xdg/openbox
-    cp /usr/share/themes/blackarch/openbox-3-blackarch/* \
-        /usr/share/themes/blackarch/openbox-3
+    #cp -r /usr/share/fluxbox-blackarch/* /usr/share/fluxbox
+    #cp /etc/xdg/awesome/rc.lua.blackarch /etc/xdg/awesome/rc.lua
+    #cp -r /etc/xdg/openbox-blackarch/* /etc/xdg/openbox
+    #cp /usr/share/themes/blackarch/openbox-3-blackarch/* \
+    #    /usr/share/themes/blackarch/openbox-3
 
 
-    return $SUCCESS
-}
+    #return $SUCCESS
+#}
 
 
 # install the system
@@ -418,8 +418,8 @@ install()
     # set keymaps choosed before silently
     printf "KEYMAP=%s\n" "${KEYMAPS}" > /etc/vconsole.conf
 
-    header "X configuration"
-    configure_X
+    #header "X configuration"
+    #configure_X
 
     header "grub installation"
     install_grub
