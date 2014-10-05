@@ -34,7 +34,7 @@ FAILURE=31337
 VERBOSE="/dev/null"
 
 # blackarch-install version
-VERSION="v0.7.6"
+VERSION="v0.7.7"
 
 # colors
 WHITE="$(tput bold ; tput setaf 7)"
@@ -243,8 +243,8 @@ install_packages_repo()
 
     # X11 related, wms, configs
     pacman -S blackarch-config-awesome blackarch-config-fluxbox \
-      blackarch-config-lxdm blackarch-config openbox spectrwm blackarch-dwm \
-      i3-wm wmii
+      blackarch-config-lxdm blackarch-config-openbox fluxbox openbox awesome \
+      spectrwm blackarch-dwm i3-wm wmii
 
     return $SUCCESS
 }
