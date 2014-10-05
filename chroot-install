@@ -34,7 +34,7 @@ FAILURE=31337
 VERBOSE="/dev/null"
 
 # blackarch-install version
-VERSION="v0.7.5"
+VERSION="v0.7.6"
 
 # colors
 WHITE="$(tput bold ; tput setaf 7)"
@@ -238,7 +238,13 @@ install_packages_blackman()
 # install blackarch packages
 install_packages_repo()
 {
+    # repo
     pacman -S blackarch
+
+    # X11 related, wms, configs
+    pacman -S blackarch-config-awesome blackarch-config-fluxbox \
+      blackarch-config-lxdm blackarch-config openbox spectrwm blackarch-dwm \
+      i3-wm wmii
 
     return $SUCCESS
 }
@@ -333,11 +339,6 @@ generate_initramfs()
     sed -i 's/block filesystems/block encrypt filesystems/' /etc/mkinitcpio.conf
 
     mkinitcpio -p linux
-    #mkinitcpio -k /boot/vmlinuz-linux -c /etc/mkinitcpio.conf \
-    #    -g /boot/initramfs-linux.img
-    #mkinitcpio -k /boot/vmlinuz-linux -c /etc/mkinitcpio.conf \
-    #    -g /boot/initramfs-linux-falback.img -S autodetect
-    #mkinitcpio -c /etc/mkinitcpio-archiso.conf -g /boot/blackarch-linux.img
 
     return $SUCCESS
 }
@@ -360,6 +361,24 @@ set_hostname()
     printf "%s\n" "${hostname}" > /etc/hostname
 
     printf "%s" "${NC}"
+
+    return $SUCCESS
+}
+
+
+# configure X related things
+configure_X()
+{
+    # enable display manager
+    systemctl enable lxdm
+
+    # WMs
+    cp -r /usr/share/fluxbox-blackarch/* /usr/share/fluxbox
+    cp /etc/xdg/awesome/rc.lua.blackarch /etc/xdg/awesome/rc.lua
+    cp -r /etc/xdg/openbox-blackarch/* /etc/xdg/openbox
+    cp /usr/share/themes/blackarch/openbox-3-blackarch/* \
+        /usr/share/themes/blackarch/openbox-3
+
 
     return $SUCCESS
 }
@@ -398,6 +417,9 @@ install()
 
     # set keymaps choosed before silently
     printf "KEYMAP=%s\n" "${KEYMAPS}" > /etc/vconsole.conf
+
+    header "X configuration"
+    configure_X
 
     header "grub installation"
     install_grub

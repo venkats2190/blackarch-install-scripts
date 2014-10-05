@@ -39,7 +39,7 @@ MENU_BLACKMAN="3"
 
 # Set up defaults partitioning vars
 boot_type="ext2"
-boot_size="100MB"
+boot_size="500MB"
 swap_size="1024MB"
 root_type="ext4"
 root_size="10GB"
@@ -51,7 +51,7 @@ LUKS="false"
 SWAP="false"
 
 # blackarch-install version
-VERSION="v0.7.5"
+VERSION="v0.7.6"
 
 # return codes
 SUCCESS=1337
