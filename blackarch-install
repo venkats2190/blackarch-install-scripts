@@ -284,9 +284,9 @@ run_cfdisk()
 get_partitions()
 {
     # * BOOT
-    printf "%s[?] created a boot partition [y/N]: " "${WHITE}"; read a;
+    printf "%s[?] created a boot partition [y/N]: " "${WHITE}"; 
 
-    if [ "${a}" == "n" ] || [ "${a}" == "N" ]
+    if confirm
     then
         if [ "${LUKS}" == "true" ]
         then
@@ -294,7 +294,7 @@ get_partitions()
         fi
     fi
 
-    if [ "${a}" == "y" ] || [ "${a}" == "Y" ]
+    if confirm
     then
         BOOT="true"
         printf "%s[?] boot partition number [%s]: " "${WHITE}" "${default_part}"
@@ -320,8 +320,8 @@ get_partitions()
     a=""
 
     # * SWAP
-    printf "%s[?] created a swap partition [y/N]: " "${WHITE}"; read a;
-    if [ "${a}" == "y" ] || [ "${a}" = "Y" ]
+    printf "%s[?] created a swap partition [y/N]: " "${WHITE}"; 
+    if confirm
     then
         SWAP="true"
         printf "[?] swap partition number [%s]:" "${default_part}"; read a
@@ -373,8 +373,7 @@ format_partition()
 
     wprintf "   -> / %s with type %s" "${root_part}" "${root_type}"
 
-    printf "%s[?] are you sure [y/N]: " "${WHITE}"; read a
-
+    printf "%s[?] are you sure [y/N]: " "${WHITE}"; 
     # safety checks
     if [ "${BOOT}" == "true" ]
     then
@@ -383,7 +382,7 @@ format_partition()
 
     umount "${root_part}" &> /dev/null
 
-    if [ "${a}" == "y" ] || [ "${a}" == "Y" ]
+    if confirm
     then
         # * BOOT
         if [ "${BOOT}" == "true" ]
@@ -431,9 +430,9 @@ ask_for_luks()
 {
     printf "%s" "${WHITE}"
 
-    printf "[?] full encrypted root [y/N]: "; read a;
+    printf "[?] full encrypted root [y/N]: "; 
 
-    if [ "${a}" == "y" ] || [ "${a}" == "Y" ]
+    if confirm
     then
         LUKS="true"
 	    warn "root will be encrypted"
@@ -714,6 +713,15 @@ get_opts()
     return $SUCCESS
 }
 
+#confirm user inputted yYnN. 
+confirm()
+{ 
+	local a; 
+		while [[ $a != [YyNn] ]]; 
+		do read -n1 -p "$1" a; 
+	done;
+	 [[ $a = [Yy] ]]; 
+}
 
 # controller and program flow
 main()
