@@ -306,7 +306,7 @@ get_partitions()
             boot_part="${HD}${default_part}"
         fi
 
-        printf "[?] fs type of boot partition [ext4]: "
+        printf "[?] fs type of boot partition [ext2]: "
         read a
         if [ "${a}" != "" ]
         then
@@ -324,7 +324,7 @@ get_partitions()
     if confirm
     then
         SWAP="true"
-        printf "[?] swap partition number [%s]:" "${default_part}"; read a
+        printf "\n [?] swap partition number [%s]:" "${default_part}"; read a
         if [ "${a}" != "" ]
         then
             swap_part="${HD}${a}"
@@ -718,7 +718,7 @@ confirm()
 { 
 	local a; 
 		while [[ $a != [YyNn] ]]; 
-		do read -n1 -p "$1" a; 
+		do read a; 
 	done;
 	 [[ $a = [Yy] ]]; 
 }
