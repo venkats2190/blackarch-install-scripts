@@ -284,9 +284,8 @@ run_cfdisk()
 get_partitions()
 {
     # * BOOT
-    printf "%s[?] created a boot partition [y/N]: " "${WHITE}"; 
 
-    if confirm
+    if confirm "%s[?] created a boot partition [y/N]: " "${WHITE}"
     then
         if [ "${LUKS}" == "true" ]
         then
@@ -320,8 +319,7 @@ get_partitions()
     a=""
 
     # * SWAP
-    printf "%s[?] created a swap partition [y/N]: " "${WHITE}"; 
-    if confirm
+    if confirm "%s[?] created a swap partition [y/N]: " "${WHITE}"
     then
         SWAP="true"
         printf "\n [?] swap partition number [%s]:" "${default_part}"; read a
@@ -430,9 +428,7 @@ ask_for_luks()
 {
     printf "%s" "${WHITE}"
 
-    printf "[?] full encrypted root [y/N]: "; 
-
-    if confirm
+    if confirm "[?] full encrypted root [y/N]: "
     then
         LUKS="true"
 	    warn "root will be encrypted"
@@ -716,11 +712,11 @@ get_opts()
 #confirm user inputted yYnN. 
 confirm()
 { 
-	local a; 
-		while [[ $a != [YyNn] ]]; 
-		do read a; 
-	done;
-	 [[ $a = [Yy] ]]; 
+    local r
+      until [[ $r = [YyNn] ]]; do
+      read -p "$1" r
+      done
+      [[ $r == [Yy] ]] 
 }
 
 # controller and program flow
