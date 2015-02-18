@@ -468,31 +468,29 @@ install_drive()
     return "${SUCCESS}"
 }
 
+download_bootstrap()
+{
+    bootstrap_tarball=$(curl -s https://mirrors.kernel.org/archlinux/iso/latest/|grep "bootstrap.*$(uname -m)"|head -n1|cut -d'"' -f2)
+
+    wget "https://mirrors.kernel.org/archlinux/iso/latest/${bootstrap_tarball}"
+    [ "${?}" != "0" ] && cri "Error downloading bootstrap tarball"
+
+    return "${SUCCESS}"
+}
+
 install_chroot()
 {
     menu_opt_how=$1
+    find_tarball=$(find * -name archlinux*tar.gz)
 
     # -pcvzf
-    bootstrap_32="http://mirror.aarnet.edu.au/pub/archlinux/iso/2014.03.01/archlinux-bootstrap-2014.03.01-i686.tar.gz"
-    bootstrap_64="http://mirror.aarnet.edu.au/pub/archlinux/iso/2014.03.01/archlinux-bootstrap-2014.03.01-x86_64.tar.gz"
     mkdir -p bootstrap; cd bootstrap
-    case "$(uname -m)" in
-        "i686")
-            # fix this
-            ! [ -f "archlinux-bootstrap*" ] &&
-            wget "${bootstrap_32}"
-            ;;
-        "x86_64")
-            # fix this
-          ! [ -f "blackarch_x86_64.tar.gz" ] &&
-            wget "${bootstrap_64}"
-            ;;
-    esac
 
-    mkdir -p "${ROOT}"
+    [ -z "${find_tarball}" ] && download_bootstrap
 
-    # fix this
-    tar -zxvf blackarch_x86_64.tar.gz -C "${ROOT}"
+    wprintf "Decompressing Archlinux..."
+    tar -zxvf "$(find * -name archlinux*tar.gz)" &> /dev/null
+    mv "root.$(uname -m)" "${ROOT}"
 
     # if live dump everything
     [ "${menu_opt_how}" == "${MENU_LIVE}" ] && dump_live
