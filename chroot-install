@@ -127,13 +127,16 @@ select_ba_repo()
     github_url="https://github.com/BlackArch/blackarch/raw/master/mirror/mirror.lst"
 
     wprintf "[+] Fetching mirror list..."
-    # check wget installed
+    # check basic software needed
     command -v wget >/dev/null 2>&1 ||
         pacman -S wget --noconfirm
+    command -v sed >/dev/null 2>&1 ||
+        pacman -S sed --noconfirm
+    command -v grep >/dev/null 2>&1 ||
+        pacman -S grep --noconfirm
 
     wget -q "${github_url}" -O "${mirror_file}"
-    [ "${?}" != "0" ] && wprintf "[-] wget failed - setting BlackArch repository" &&
-        return "${FAILURE}"
+    [ "${?}" != "0" ] && cri "wget failed - setting BlackArch repository"
 
     wprintf "[+] Select BlackArch Repository"
 
@@ -168,6 +171,7 @@ update_system()
     [ "${?}" == "${FAILURE}" ] &&
         wprintf "[-] Mirror selection failed - We go with default one..."
 
+    # bug: it will ask again for mirror
     curl -s http://blackarch.org/strap.sh | sh
 
     if ! grep -q "blackarch" /etc/pacman.conf; then
@@ -249,7 +253,7 @@ configure_users()
     cp /root/.bashrc /root/.bash_profile
 
     printf "[+] Do you want to setup a normal user account [y/N]: "; read a
-    if [ "${a}" == "y" ] || [ "${a}" == "Y"]; then
+    if [ "${a}" == "y" ] || [ "${a}" == "Y" ]; then
         printf "[+] User name: "; read user
         useradd -m -p "" -g users \
             -G "adm,audio,floppy,log,network,rfkill,scanner,storage,optical,power,wheel" \
@@ -302,14 +306,16 @@ install()
     wprintf "[+] Configure system users..."
     configure_users
 
-    "${LUKS}" && wprintf "[+] Re-Generating initfs..."
-    "${LUKS}" && generate_initfs
+    if [ -z "${CHROOT_INSTALL}" ]; then
+        "${LUKS}" && wprintf "[+] Re-Generating initfs..."
+        "${LUKS}" && generate_initfs
 
-    wprintf "[+] Setting blackarch hostname..."
-    hostname blackarch
+        wprintf "[+] Setting blackarch hostname..."
+        hostname blackarch
 
-    wprintf "[+] Installing grub..."
-    install_grub
+        wprintf "[+] Installing grub..."
+        install_grub
+    fi
 
     # sync hd
     sync
@@ -323,7 +329,7 @@ install()
 # parse command line options
 get_opts()
 {
-    while getopts lrbD:R:LvVH flags
+    while getopts lrbcD:R:LvVH flags
     do
         case "${flags}" in
             l)
@@ -334,6 +340,9 @@ get_opts()
                 ;;
             b)
                 opt_arg="blackman"
+                ;;
+            c)
+                CHROOT_INSTALL=1
                 ;;
             D)
                 HD=${OPTARG}

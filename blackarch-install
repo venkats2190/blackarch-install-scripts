@@ -360,7 +360,19 @@ install_chroot_script()
     mount --rbind /dev "${ROOT}/dev"
     mount --rbind /sys "${ROOT}/sys"
 
-    chroot "${ROOT}" "/bin/chroot-install" "${mode}" -D "${HD}" -R "${root_part}" "$(${LUKS} && printf '%sL' '-')"
+    # init pacman-key for debootstrap
+    if [ "${menu_opt_how}" == "${MENU_CHROOT}" ]; then
+        wprintf "   - Init pacman keyring. This will take a while..."
+        chroot "${ROOT}" dirmngr </dev/null
+        chroot "${ROOT}" pacman-key --init
+        chroot "${ROOT}" pacman-key --refresh-keys
+        chroot "${ROOT}" pacman-key --populate archlinux
+        chroot "${ROOT}" pacman -Syy
+        chroot "${ROOT}" pacman -S
+        chroot "${ROOT}" "/bin/chroot-install" "${mode}" -D "${HD}" -R "${root_part}" "$(${LUKS} && printf '%sL' '-')" -c
+    else
+        chroot "${ROOT}" "/bin/chroot-install" "${mode}" -D "${HD}" -R "${root_part}" "$(${LUKS} && printf '%sL' '-')"
+    fi
 
     # cleaning up
     rm -rf "${ROOT}/bin/${chroot_file}"
@@ -393,8 +405,11 @@ dump_live()
 
 run_chroot_script()
 {
+    wprintf "Installing BlackArch Linux"
+
     # if live not need to do this
-    if [ "${menu_opt_how}" != "${MENU_LIVE}" ]; then
+    if [ "${menu_opt_how}" != "${MENU_LIVE}" ] &&
+       [ "${menu_opt_how}" != "${MENU_CHROOT}" ]; then
         wprintf "[+] Generating pacman.conf"
         cp -Rf /etc/pacman* "${ROOT}/etc/"
 
@@ -415,16 +430,15 @@ run_chroot_script()
 
     case "${menu_opt_how}" in
         "${MENU_LIVE}")
-            install_chroot_script "-l"
+            install_chroot_script -l
             ;;
         "${MENU_REPO}")
-            install_chroot_script "-r"
+            install_chroot_script -r
             ;;
         "${MENU_BLACKMAN}")
-            install_chroot_script "-b"
+            install_chroot_script -b
             ;;
     esac
-
 }
 
 install_drive()
@@ -481,16 +495,21 @@ download_bootstrap()
 install_chroot()
 {
     menu_opt_how=$1
-    find_tarball=$(find * -name archlinux*tar.gz)
+    find_tarball=$(find * -maxdepth 0 -name archlinux*tar.gz)
 
     # -pcvzf
-    mkdir -p bootstrap; cd bootstrap
 
     [ -z "${find_tarball}" ] && download_bootstrap
 
     wprintf "Decompressing Archlinux..."
-    tar -zxvf "$(find * -name archlinux*tar.gz)" &> /dev/null
+    tar -zxvf "$(find * -maxdepth 0 -name archlinux*tar.gz)" &> /dev/null
     mv "root.$(uname -m)" "${ROOT}"
+    wprintf "Setting up Archlinux..."
+    # random server
+    printf 'Server = http://mirror.nl.leaseweb.net/archlinux/$repo/os/$arch' \
+            >> "${ROOT}/etc/pacman.d/mirrorlist"
+    cp -f /etc/resolv.conf "${ROOT}/etc/resolv.conf"
+    rm -rf "${ROOT}/README"
 
     # if live dump everything
     [ "${menu_opt_how}" == "${MENU_LIVE}" ] && dump_live
