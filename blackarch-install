@@ -508,7 +508,6 @@ install_chroot_script()
         chroot "${ROOT}" pacman-key --refresh-keys
         chroot "${ROOT}" pacman-key --populate archlinux
         chroot "${ROOT}" pacman -Syy
-        chroot "${ROOT}" pacman -S
         chroot "${ROOT}" "/bin/chroot-install" "${mode}" -D "${HD}" -R "${root_part}" "$(${LUKS} && printf '%sL' '-')" -c
     else
         chroot "${ROOT}" "/bin/chroot-install" "${mode}" -D "${HD}" -R "${root_part}" "$(${LUKS} && printf '%sL' '-')"
@@ -749,6 +748,7 @@ main()
     return "${SUCCESS}"
 }
 
+[ "$(id -u)" != "0" ] && cri "Blackarch install must be run as root"
 
 # program start
 main "${@}"
