@@ -587,8 +587,6 @@ run_chroot_script()
 # install the system
 install_drive()
 {
-    menu_opt_how="${1}"
-
     header "keymap configuration"
     set_keymaps
 
