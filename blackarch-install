@@ -651,6 +651,8 @@ install_chroot()
 # print installer menu and get chosen options
 install_menu_how()
 {
+    header "Welcome to BlackArch Linux Installation"
+
     printf "%s" "${WHITE}"
 
     while ! [ "${menu_opt_how}" = "${MENU_LIVE}" \
@@ -671,6 +673,8 @@ install_menu_how()
 
 install_menu_where()
 {
+    header "Welcome to BlackArch Linux Installation"
+
     printf "%s" "${WHITE}"
     while ! [ "${menu_opt_where}" == "${MENU_DRIVE}" \
            -o "${menu_opt_where}" == "${MENU_CHROOT}" ]; do
@@ -728,7 +732,6 @@ confirm()
 # controller and program flow
 main()
 {
-    header "Welcome to BlackArch Linux Installation"
     get_opts "${@}"
     check_env
 
