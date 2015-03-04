@@ -614,6 +614,12 @@ install_drive()
 
 download_bootstrap()
 {
+    # checks
+    command -v curl >/dev/null 2>&1 ||
+        cri "curl not found - required"
+    command -v wget >/dev/null 2>&1 ||
+        cri "wget not found - required"
+
     bootstrap_tarball=$(curl -s https://mirrors.kernel.org/archlinux/iso/latest/|grep "bootstrap.*$(uname -m)"|head -n1|cut -d'"' -f2)
 
     wget "https://mirrors.kernel.org/archlinux/iso/latest/${bootstrap_tarball}"
