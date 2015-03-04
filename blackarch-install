@@ -681,12 +681,28 @@ install_menu_how()
         printf "    1. Install from live-iso\n"
         printf "    2. Install from official repository of BlackArch\n"
         printf "    3. Install from sources using blackman\n"
-        printf "[?] select mode [h - help]: "; read menu_opt_how
+        printf "Make a choice [h - help]: "; read menu_opt_how
 
         [ "${menu_opt_how}" == "h" ] && help_menu_how
     done
 
     printf "%s\n" "${NC}"
+
+    return "${SUCCESS}"
+}
+
+help_menu_where()
+{
+    header "Welcome to BlackArch Linux Installation"
+
+    wprintf "1. Install into Hard Drive."
+    wprintf "   - Internal hard drive or external one."
+    wprintf "     /dev/sda /dev/sdb /dev/sdc ..."
+    wprintf "2. Install into chroot from existing linux."
+    wprintf "   - Install BlackArch inside chroot into your system."
+    wprintf "     The OS may differ from Archlinux, you can use"
+    wprintf "     Debian, Ubuntu, Gentoo..."
+    wprintf "Press key to continue...."; read _tmp
 
     return "${SUCCESS}"
 }
@@ -698,10 +714,12 @@ install_menu_where()
     printf "%s" "${WHITE}"
     while ! [ "${menu_opt_where}" == "${MENU_DRIVE}" \
            -o "${menu_opt_where}" == "${MENU_CHROOT}" ]; do
-        printf "[+] Where to install BlackArch:\n"
-        printf "    1. Install into Drive.\n"
+        printf "[*] Where to install BlackArch:\n"
+        printf "    1. Install into Hard Drive.\n"
         printf "    2. Install into chroot from existing linux.\n"
-        printf "Make a choice: "; read menu_opt_where
+        printf "Make a choice [h - help]: "; read menu_opt_where
+
+        [ "${menu_opt_where}" == "h" ] && help_menu_where
     done
 
     if [ "${menu_opt_where}" == "${MENU_CHROOT}" ]; then
