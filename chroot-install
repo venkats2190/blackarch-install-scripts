@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 ################################################################################
 #                                                                              #
 # blackarchinstall - Blackarch Install                                         #
@@ -34,7 +34,7 @@ FAILURE=31337
 VERBOSE="/dev/null"
 
 # blackarch-install version
-VERSION="v0.7.8"
+VERSION="v0.8 - testing"
 
 # colors
 WHITE="$(tput bold ; tput setaf 7)"
@@ -58,7 +58,7 @@ wprintf()
     shift
     printf "%s${fmt}%s\n" "${WHITE}" "$@" "${NC}"
 
-    return $SUCCESS
+    return "${SUCCESS}"
 }
 
 
@@ -70,7 +70,7 @@ warn()
     shift
     printf "%s[!] WARNING: ${fmt}%s\n" "${RED}" "${@}" "${NC}"
 
-    return $SUCCESS
+    return "${SUCCESS}"
 }
 
 
@@ -82,7 +82,7 @@ err()
     shift
     printf "%s[-] ERROR: ${fmt}%s\n" "${RED}" "${@}" "${NC}"
 
-    return $FAILURE
+    return "${FAILURE}"
 }
 
 
@@ -93,7 +93,7 @@ cri()
     shift
     printf "%s[-] CRITICAL: ${fmt}%s\n" "${RED}" "${@}" "${NC}"
 
-    exit $FAILURE
+    exit "${FAILURE}"
 }
 
 
@@ -103,7 +103,7 @@ banner()
     printf "%s--==[ blackarch-install %s ]==--%s\n" \
         "${YELLOW}" "${VERSION}" "${NC}"
 
-    return $SUCCESS
+    return "${SUCCESS}"
 }
 
 
@@ -118,7 +118,7 @@ header()
     printf '%*s\n\n\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
     wprintf ">> %s\n\n" "${head}"
 
-    return $SUCCESS
+    return "${SUCCESS}"
 }
 
 
@@ -127,25 +127,24 @@ usage()
 {
     cat << EOF
 usage: $0 <arg> | <misc>
-options:
+OPTIONS:
     -l: live-iso install
     -r: repository install
     -b: blackman install
     -d: device target [/dev/sda]
-misc:
+MISC:
     -V: print version and exit
     -H: print help and exit
 EOF
 
-    exit $SUCCESS
+    exit "${SUCCESS}"
 }
 
 
 # check environment
 check_env()
 {
-    if [ -f /var/lib/pacman/db.lck ]
-    then
+    if [ -f /var/lib/pacman/db.lck ]; then
         cri "pacman locked - rm /var/lib/pacman/db.lck"
     fi
 }
@@ -158,14 +157,16 @@ select_ba_repo()
     github_url="https://github.com/BlackArch/blackarch/raw/master/mirror/mirror.lst"
 
     wprintf "[*] fetching mirror list"
-    # check if wget installed
-    command -v wget >/dev/null 2>&1 || pacman -S wget --noconfirm
+    # check basic software needed
+    command -v wget >/dev/null 2>&1 ||
+        pacman -S wget --noconfirm
+    command -v sed >/dev/null 2>&1 ||
+        pacman -S sed --noconfirm
+    command -v grep >/dev/null 2>&1 ||
+        pacman -S grep --noconfirm
+
     wget -q "${github_url}" -O "${mirror_file}"
-    if [ "${?}" != "0" ]
-    then
-        err "wget failed - setting BlackArch repository"
-        return $FAILURE
-    fi
+    [ "${?}" != "0" ] && cri "wget failed - setting BlackArch repository"
 
     count="1"
     local IFS='|'
@@ -177,8 +178,7 @@ select_ba_repo()
 
     printf "%s[?] select mirror number: " "${WHITE}"; read a
 
-    if [ "${a}" -gt "$(wc -l < ${mirror_file})" ]
-    then
+    if [ "${a}" -gt "$(wc -l < ${mirror_file})" ]; then
         # BLACKARCH_REPO_URL gets the default one - choose better next time ;)
         wprintf "[*] you fucked up man - we select BlackArch for you..."
     else
@@ -190,7 +190,7 @@ select_ba_repo()
     # cleaning up
     rm -rf "${mirror_file}"
 
-    return $SUCCESS
+    return "${SUCCESS}"
 }
 
 
@@ -200,15 +200,13 @@ update_system()
     wprintf "[*] adding BlackArch repository"
 
     select_ba_repo
-    if [ "${?}" = "$FAILURE" ]
-    then
+    if [ "${?}" = "${FAILURE}" ]; then
         warn "mirror selection failed - we go with default one"
     fi
 
     curl -s http://blackarch.org/strap.sh | sh
 
-    if ! grep -q "blackarch" /etc/pacman.conf
-    then
+    if ! grep -q "blackarch" /etc/pacman.conf; then
         printf '[blackarch]\nServer = %s\n' "${BLACKARCH_REPO_URL}" \
             >> /etc/pacman.conf
     else
@@ -217,7 +215,7 @@ update_system()
 
     pacman -Syyu --noconfirm
 
-    return $SUCCESS
+    return "${SUCCESS}"
 }
 
 
@@ -231,7 +229,7 @@ install_packages_blackman()
     ln -s /usr/share/blackman/blackman /usr/bin
     blackman -a
 
-    return $SUCCESS
+    return "${SUCCESS}"
 }
 
 
@@ -242,11 +240,13 @@ install_packages_repo()
     pacman -S blackarch
 
     # X11 related, wms, configs
-    pacman -S blackarch-config-awesome blackarch-config-fluxbox \
-      blackarch-config-lxdm blackarch-config-openbox fluxbox openbox awesome \
-      spectrwm blackarch-dwm i3-wm wmii
+    if [ -z "${CHROOT_INSTALL}" ]; then
+        pacman -S blackarch-config-awesome blackarch-config-fluxbox \
+         blackarch-config-lxdm blackarch-config-openbox fluxbox openbox awesome \
+        spectrwm blackarch-dwm i3-wm wmii
+    fi
 
-    return $SUCCESS
+    return "${SUCCESS}"
 }
 
 
@@ -261,8 +261,7 @@ install_grub()
 
     printf 'GRUB_BACKGROUND="/boot/grub/splash.png"\n' >> /etc/default/grub
 
-    if [ "${LUKS}" == "true" ]
-    then
+    if [ "${LUKS}" == "true" ]; then
         sed -i "s|quiet|cryptdevice=${ROOT_PART}:cryptroot root=/dev/mapper/cryptroot|" /etc/default/grub
         sed -i 's|"Arch"|"BlackArch"|' /etc/default/grub
         #sed -i "s|rw  quiet|rw cryptdevice=${ROOT_PART}:cryptroot|" \
@@ -272,7 +271,7 @@ install_grub()
     grub-install --target=i386-pc "${HD}"
     grub-mkconfig -o /boot/grub/grub.cfg
 
-    return $SUCCESS
+    return "${SUCCESS}"
 }
 
 
@@ -281,22 +280,20 @@ set_passwd()
 {
     user="${1}"
 
-    if [ -n "${user}" ]
-    then
+    if [ -n "${user}" ]; then
         passwd "${user}"
     else
         passwd
     fi
 
-    if [ "${?}" != "0" ]
-    then
+    if [ "${?}" != "0" ]; then
         wprintf "wrong passwd - please try again"
         set_passwd "${user}"
     else
-        return $SUCCESS
+        return "${SUCCESS}"
     fi
 
-    return $SUCCESS
+    return "${SUCCESS}"
 }
 
 
@@ -312,8 +309,7 @@ configure_users()
     cp /root/.bashrc /root/.bash_profile
 
     printf "[?] setup a normal user account [y/N]: "; read a
-    if [ "${a}" == "y" ] || [ "${a}" == "Y" ]
-    then
+    if [ "${a}" == "y" ] || [ "${a}" == "Y" ]; then
         printf "[?] user name: "; read user
         useradd -m -p "" -g users \
             -G "adm,audio,floppy,log,network,rfkill,scanner,storage,optical,power,wheel" \
@@ -329,7 +325,7 @@ configure_users()
 
     printf "%s" "${NC}"
 
-    return $SUCCESS
+    return "${SUCCESS}"
 }
 
 
@@ -340,7 +336,7 @@ generate_initramfs()
 
     mkinitcpio -p linux
 
-    return $SUCCESS
+    return "${SUCCESS}"
 }
 
 
@@ -353,8 +349,7 @@ set_hostname()
     printf "[?] set hostname [blackarch]: "
     read hostname
 
-    if [ "${hostname}" == "" ]
-    then
+    if [ "${hostname}" == "" ]; then
         hostname="blackarch"
     fi
 
@@ -362,7 +357,7 @@ set_hostname()
 
     printf "%s" "${NC}"
 
-    return $SUCCESS
+    return "${SUCCESS}"
 }
 
 
@@ -380,7 +375,7 @@ set_hostname()
     #    /usr/share/themes/blackarch/openbox-3
 
 
-    #return $SUCCESS
+    #return "${SUCCESS}"
 #}
 
 
@@ -409,34 +404,36 @@ install()
     header "user configuration"
     configure_users
 
-    header "initramfs"
-    "${LUKS}" && generate_initramfs
+    if [ -z "${CHROOT_INSTALL}" ]; then
+        header "initramfs"
+        "${LUKS}" && generate_initramfs
 
-    header "hostname setup"
-    set_hostname
+        header "hostname setup"
+        set_hostname
 
-    # set keymaps choosed before silently
-    printf "KEYMAP=%s\n" "${KEYMAPS}" > /etc/vconsole.conf
+        # set keymaps choosed before silently
+        printf "KEYMAP=%s\n" "${KEYMAPS}" > /etc/vconsole.conf
 
-    #header "X configuration"
-    #configure_X
+        #header "X configuration"
+        #configure_X
 
-    header "grub installation"
-    install_grub
+        header "grub installation"
+        install_grub
+    fi
 
     # sync hd
     sync
 
     printf "%s[*] BlackArch Linux ready! Enjoy!%s\n" "${RED}" "${NC}"
 
-    return $SUCCESS
+    return "${SUCCESS}"
 }
 
 
 # parse command line options
 get_opts()
 {
-    while getopts lrbD:R:Lk:vVH flags
+    while getopts lrbcD:R:LvVH flags
     do
         case "${flags}" in
             l)
@@ -447,6 +444,9 @@ get_opts()
                 ;;
             b)
                 opt_arg="blackman"
+                ;;
+            c)
+                CHROOT_INSTALL=1
                 ;;
             D)
                 HD=${OPTARG}
@@ -465,7 +465,7 @@ get_opts()
                 ;;
             V)
                 printf "%s\n" "${VERSION}"
-                exit $SUCCESS
+                exit "${SUCCESS}"
                 ;;
             H)
                 usage
@@ -476,22 +476,22 @@ get_opts()
         esac
     done
 
-    return $SUCCESS
+    return "${SUCCESS}"
 }
 
 
 # controller and program flow
 main()
 {
-    get_opts "${@}"
+    get_opts ${@}
     check_env
     install "${opt_arg}"
 
-    return $SUCCESS
+    return "${SUCCESS}"
 }
 
 
 # program start
-main "${@}"
+main ${@}
 
 # EOF
