@@ -646,9 +646,6 @@ install_chroot()
     cp -f /etc/resolv.conf "${ROOT}/etc/resolv.conf"
     rm -rf "${ROOT}/README"
 
-    # if live dump everything
-    [ "${menu_opt_how}" == "${MENU_LIVE}" ] && dump_live
-
     return "${SUCCESS}"
 }
 
@@ -738,9 +735,15 @@ main()
     check_env
 
     if [ "${SEC_ENABLE}" = "false" ]; then
-        clear
-        install_menu_where
         install_menu_how
+        # dont show chroot mode if we are installing from live ISO
+        # and set MENU_DRIVE
+        if [ "${menu_opt_how}" != "${MENU_LIVE}" ]; then
+            install_menu_where
+        else
+            menu_opt_where="${MENU_DRIVE}"
+        fi
+
         if [ "${menu_opt_where}" == "${MENU_DRIVE}" ]; then
             install_drive
         else
