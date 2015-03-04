@@ -1,6 +1,11 @@
 Blackarch Install
 -----------------
 
+Current Testing Version: 0.8
+    - Chroot Feature
+        -> install Blackarch on the top of other OS (debian, gentoo, etc.)
+
+
 Install From ArchLinux/BlackArch Live-ISO-DVD/BlackArch NetInstall
 ----------------------------------------------------------------
 Version: 0.7 (See Github Tags and Changelog)
