@@ -1,3 +1,4 @@
+[ ] Chroot Feature - give support for armv*
 [ ] Installation Resume
 [ ] Clean up on failure -  it doesn't unmount or run cryptsetup close on failure
 [ ] Add arch mirrorlist generator support + rankmirror call based on user's country code enter
