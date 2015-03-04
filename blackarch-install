@@ -647,23 +647,43 @@ install_chroot()
     return "${SUCCESS}"
 }
 
+help_menu_how()
+{
+    header "Welcome to BlackArch Linux Installation"
+
+    wprintf "1. Install from live-iso"
+    wprintf "   - You are now inside BlackArch image loaded from LIVE ISO"
+    wprintf "     and you want to have exactly the same system installed"
+    wprintf "     into your hard drive."
+    wprintf "2. Install from official repository of BlackArch"
+    wprintf "   - Install a new copy of Archlinux Base System and"
+    wprintf "     select the tools from the BlackArch reporsitory"
+    wprintf "     to install inside."
+    wprintf "3. Install from sources using blackman"
+    wprintf "   - Install a new copy of Archlinux Base System and"
+    wprintf "     compile the tools from source code before install."
+    wprintf "Press key to continue...."; read _tmp
+
+    return "${SUCCESS}"
+}
 
 # print installer menu and get chosen options
 install_menu_how()
 {
-    header "Welcome to BlackArch Linux Installation"
-
-    printf "%s" "${WHITE}"
-
     while ! [ "${menu_opt_how}" = "${MENU_LIVE}" \
            -o "${menu_opt_how}" = "${MENU_REPO}" \
            -o "${menu_opt_how}" = "${MENU_BLACKMAN}" ]; do
+        header "Welcome to BlackArch Linux Installation"
 
-        printf "[*] installation modes:\n"
-        printf "    1. install from live-iso\n"
-        printf "    2. install from official repository of BlackArch\n"
-        printf "    3. install from sources using blackman\n"
-        printf "[?] select mode: "; read menu_opt_how
+        printf "%s" "${WHITE}"
+
+        printf "[*] Installation modes:\n"
+        printf "    1. Install from live-iso\n"
+        printf "    2. Install from official repository of BlackArch\n"
+        printf "    3. Install from sources using blackman\n"
+        printf "[?] select mode [h - help]: "; read menu_opt_how
+
+        [ "${menu_opt_how}" == "h" ] && help_menu_how
     done
 
     printf "%s\n" "${NC}"
