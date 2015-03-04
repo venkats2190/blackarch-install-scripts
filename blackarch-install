@@ -651,18 +651,16 @@ help_menu_how()
 {
     header "Welcome to BlackArch Linux Installation"
 
-    wprintf "1. Install from live-iso"
-    wprintf "   - You are now inside BlackArch image loaded from LIVE ISO"
-    wprintf "     and you want to have exactly the same system installed"
-    wprintf "     into your hard drive."
+    wprintf "1. Clone Live ISO"
+    wprintf "   - Copy the Live ISO environment directly onto disk."
     wprintf "2. Install from official repository of BlackArch"
-    wprintf "   - Install a new copy of Archlinux Base System and"
-    wprintf "     select the tools from the BlackArch reporsitory"
-    wprintf "     to install inside."
+    wprintf "   - Install Arch Linux from the official Arch repositories"
+    wprintf "     and install tools from the BlackArch package repository."
     wprintf "3. Install from sources using blackman"
-    wprintf "   - Install a new copy of Archlinux Base System and"
-    wprintf "     compile the tools from source code before install."
-    wprintf "Press key to continue...."; read _tmp
+    wprintf "   - Install Arch Linux from the official Arch"
+    wprintf "     repositories and compile the BlackArch tools"
+    wprintf "     from source."
+    wprintf "Press any key to continue...."; read _tmp
 
     return "${SUCCESS}"
 }
@@ -678,8 +676,8 @@ install_menu_how()
         printf "%s" "${WHITE}"
 
         printf "[*] Installation modes:\n"
-        printf "    1. Install from live-iso\n"
-        printf "    2. Install from official repository of BlackArch\n"
+        printf "    1. Clone Live ISO\n"
+        printf "    2. Install from package repository\n"
         printf "    3. Install from sources using blackman\n"
         printf "Make a choice [h - help]: "; read menu_opt_how
 
@@ -695,28 +693,27 @@ help_menu_where()
 {
     header "Welcome to BlackArch Linux Installation"
 
-    wprintf "1. Install into Hard Drive."
-    wprintf "   - Internal hard drive or external one."
-    wprintf "     /dev/sda /dev/sdb /dev/sdc ..."
-    wprintf "2. Install into chroot from existing linux."
-    wprintf "   - Install BlackArch inside chroot into your system."
-    wprintf "     The OS may differ from Archlinux, you can use"
-    wprintf "     Debian, Ubuntu, Gentoo..."
-    wprintf "Press key to continue...."; read _tmp
+    wprintf "1. Install to Drive"
+    wprintf "   - Internal or external drive (e.g. /dev/sda)"
+    wprintf "2. Install to directory"
+    wprintf "   - Installs BlackArch for use with chroot."
+    wprintf "     This allows you use BlackArch with other"
+    wprintf "     distros (e.g. Debian, Ubuntu, Gentoo)"
+    wprintf "Press any key to continue...."; read _tmp
 
     return "${SUCCESS}"
 }
 
 install_menu_where()
 {
-    header "Welcome to BlackArch Linux Installation"
-
-    printf "%s" "${WHITE}"
-    while ! [ "${menu_opt_where}" == "${MENU_DRIVE}" \
+   while ! [ "${menu_opt_where}" == "${MENU_DRIVE}" \
            -o "${menu_opt_where}" == "${MENU_CHROOT}" ]; do
+        header "Welcome to BlackArch Linux Installation"
+        printf "%s" "${WHITE}"
+
         printf "[*] Where to install BlackArch:\n"
-        printf "    1. Install into Hard Drive.\n"
-        printf "    2. Install into chroot from existing linux.\n"
+        printf "    1. Install to Drive\n"
+        printf "    2. Install to directory\n"
         printf "Make a choice [h - help]: "; read menu_opt_where
 
         [ "${menu_opt_where}" == "h" ] && help_menu_where
