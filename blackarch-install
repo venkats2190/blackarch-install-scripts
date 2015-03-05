@@ -501,7 +501,8 @@ install_chroot_script()
     mount --rbind /sys "${ROOT}/sys"
 
     # init pacman-key for debootstrap
-    if [ "${menu_opt_how}" == "${MENU_CHROOT}" ]; then
+    if [ "${menu_opt_how}" == "${MENU_CHROOT}" ] ||
+       [ "${menu_opt_how}" == "${MENU_LIVE}" ]; then
         wprintf "   - Init pacman keyring. This will take a while..."
         chroot "${ROOT}" dirmngr </dev/null
         chroot "${ROOT}" pacman-key --init
