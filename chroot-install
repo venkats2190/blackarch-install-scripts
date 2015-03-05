@@ -240,7 +240,8 @@ install_packages_repo()
     pacman -S blackarch
 
     # X11 related, wms, configs
-    if [ -z "${CHROOT_INSTALL}" ]; then
+    if [ -z "${CHROOT_INSTALL}" ] ||
+       [ "${menu_opt}" == "live" ]; then
         pacman -S blackarch-config-awesome blackarch-config-fluxbox \
          blackarch-config-lxdm blackarch-config-openbox fluxbox openbox awesome \
         spectrwm blackarch-dwm i3-wm wmii

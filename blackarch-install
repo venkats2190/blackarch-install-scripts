@@ -509,10 +509,16 @@ install_chroot_script()
         chroot "${ROOT}" pacman-key --refresh-keys
         chroot "${ROOT}" pacman-key --populate archlinux
         chroot "${ROOT}" pacman -Syy
-        chroot "${ROOT}" "/bin/chroot-install" "${mode}" -D "${HD}" -R "${root_part}" "$(${LUKS} && printf '%sL' '-')" -c
-    else
-        chroot "${ROOT}" "/bin/chroot-install" "${mode}" -D "${HD}" -R "${root_part}" "$(${LUKS} && printf '%sL' '-')"
     fi
+
+    case "${menu_opt_how}" in
+        "${MENU_CHROOT}")
+            chroot "${ROOT}" "/bin/chroot-install" "${mode}" -D "${HD}" -R "${root_part}" "$(${LUKS} && printf '%sL' '-')" -c
+            ;;
+        *)
+            chroot "${ROOT}" "/bin/chroot-install" "${mode}" -D "${HD}" -R "${root_part}" "$(${LUKS} && printf '%sL' '-')"
+            ;;
+    esac
 
     # cleaning up
     rm -rf "${ROOT}/bin/${chroot_file}"
