@@ -601,11 +601,13 @@ install_drive()
     format_partition
     mount_filesystem
 
-    header "system installation"
-    [ "${menu_opt_how}" = "${MENU_LIVE}" ] && dump_live
-
-    header "package installation"
-    install_base_packages
+    if [ "${menu_opt_how}" = "${MENU_LIVE}" ]; then
+        header "clone live ISO"
+        dump_live
+    else
+        header "package installation"
+        install_base_packages
+    fi
 
     return "${SUCCESS}"
 }
