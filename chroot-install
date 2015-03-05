@@ -159,11 +159,11 @@ select_ba_repo()
     wprintf "[*] fetching mirror list"
     # check basic software needed
     command -v wget >/dev/null 2>&1 ||
-        pacman -S wget --noconfirm
+        pacman -S wget --noconfirm &>/dev/null
     command -v sed >/dev/null 2>&1 ||
-        pacman -S sed --noconfirm
+        pacman -S sed --noconfirm &>/dev/null
     command -v grep >/dev/null 2>&1 ||
-        pacman -S grep --noconfirm
+        pacman -S grep --noconfirm &>/dev/null
 
     wget -q "${github_url}" -O "${mirror_file}"
     [ "${?}" != "0" ] && cri "wget failed - setting BlackArch repository"
@@ -197,14 +197,37 @@ select_ba_repo()
 # update the system
 update_system()
 {
-    wprintf "[*] adding BlackArch repository"
+    header "[*] adding BlackArch repository"
 
     select_ba_repo
     if [ "${?}" = "${FAILURE}" ]; then
         warn "mirror selection failed - we go with default one"
     fi
 
-    curl -s http://blackarch.org/strap.sh | sh
+    curl -s http://blackarch.org/strap.sh | bash
+    #debug
+    #exit
+    #curl -s -O \
+    #     'http://blackarch.org/keyring/blackarch-keyring.pkg.tar.xz{,.sig}'
+
+    #gpg \
+    #    --keyserver hkp://pgp.mit.edu \
+    #    --recv-keys 4345771566D76038C7FEB43863EC0ADBEA87E4E3 > /dev/null 2>&1
+    #if ! gpg \
+    #    --keyserver-options no-auto-key-retrieve \
+    #    --with-fingerprint blackarch-keyring.pkg.tar.xz.sig > /dev/null 2>&1
+    #then
+    #    cri 'invalid keyring signature. please stop by irc.freenode.net/blackarch'
+    #fi
+    #pacman-key --init
+    #if ! pacman --config /dev/null \
+    #     --noconfirm -U blackarch-keyring.pkg.tar.xz
+    #then
+    #    err 'keyring installation failed'
+    #fi
+
+    #rm -rf blackarch-keyring.*
+    #exit
 
     if ! grep -q "blackarch" /etc/pacman.conf; then
         printf '[blackarch]\nServer = %s\n' "${BLACKARCH_REPO_URL}" \
@@ -255,8 +278,10 @@ install_packages_repo()
 install_grub()
 {
     pacman -S grub --noconfirm --needed
+    grub-install --target=i386-pc "${HD}"
+    grub-mkconfig -o /boot/grub/grub.cfg
 
-    mv /boot/splash.png /boot/grub/
+    mv /tmp/splash.png /boot/grub/
 
     sed -i 's/Arch Linux/BlackArch Linux/' /boot/grub/grub.cfg
 
@@ -268,9 +293,6 @@ install_grub()
         #sed -i "s|rw  quiet|rw cryptdevice=${ROOT_PART}:cryptroot|" \
         #  /boot/grub/grub.cfg
     fi
-
-    grub-install --target=i386-pc "${HD}"
-    grub-mkconfig -o /boot/grub/grub.cfg
 
     return "${SUCCESS}"
 }
@@ -306,7 +328,7 @@ configure_users()
     printf "[*] setting up root password\n"
     set_passwd
 
-    mv /mnt/shell/root/.bashrc /root/
+    mv /tmp/shell/root/.bashrc /root/
     cp /root/.bashrc /root/.bash_profile
 
     printf "[?] setup a normal user account [y/N]: "; read a
@@ -316,7 +338,7 @@ configure_users()
             -G "adm,audio,floppy,log,network,rfkill,scanner,storage,optical,power,wheel" \
             -s /bin/bash "${user}" && printf "[*] user '%s' created\n" "${user}"
         set_passwd "${user}"
-        mv /mnt/shell/user/.bashrc "/home/${user}/"
+        mv /tmp/shell/user/.bashrc "/home/${user}/"
         cp "/home/${user}/.bashrc" "/home/${user}/.bash_profile"
         chown -R "${user}:users" "/home/${user}"
     fi
@@ -379,7 +401,6 @@ set_hostname()
     #return "${SUCCESS}"
 #}
 
-
 # install the system
 install()
 {
@@ -425,7 +446,7 @@ install()
     # sync hd
     sync
 
-    printf "%s[*] BlackArch Linux ready! Enjoy!%s\n" "${RED}" "${NC}"
+    printf "\n%s[*] BlackArch Linux ready! Enjoy!%s\n" "${RED}" "${NC}"
 
     return "${SUCCESS}"
 }

@@ -26,7 +26,7 @@
 SEC_ENABLE="false"
 
 # root variable
-ROOT="/mnt/blackarch"
+ROOT="/tmp/blackarch"
 
 # Partition CONST
 PART_AUTO="1"
@@ -481,9 +481,16 @@ install_base_packages()
 
 
 # install chroot system
-install_chroot_script()
+run_chroot_script()
 {
-    mode=${1}
+    # copy needed files by chroot
+    if [ -d shell ]; then
+        cp -f shell/etc/issue "${ROOT}/etc/"
+        cp -R shell/ "${ROOT}/tmp/"
+    else
+        cp -f /usr/share/blackarch-install-scripts/shell/etc/issue "${ROOT}/etc/"
+        cp -R /usr/share/blackarch-install-scripts/shell "${ROOT}/tmp/"
+    fi
 
     # setup chroot-install path
     if [ -f chroot-install ]; then
@@ -493,25 +500,43 @@ install_chroot_script()
         chroot_file="/usr/share/blackarch-install-scripts/chroot-install"
     fi
 
+    # splash for grub
+    if [ -f grub/splash.png ]; then
+        splash_file="grub/splash.png"
+    else
+        # we are a blackarch package installed
+        splash_file="/usr/share/blackarch-install-scripts/grub/splash.png"
+    fi
+
     cp "${chroot_file}" "${ROOT}/bin/"
+    cp "${splash_file}" "${ROOT}/tmp/"
+    cp /etc/resolv.conf "${ROOT}/etc/"
+
     mkdir -p ${ROOT}/{proc,sys,dev}
 
     mount -t proc proc "${ROOT}/proc"
     mount --rbind /dev "${ROOT}/dev"
     mount --rbind /sys "${ROOT}/sys"
 
-    # init pacman-key for debootstrap
-    if [ "${menu_opt_how}" == "${MENU_CHROOT}" ] ||
-       [ "${menu_opt_how}" == "${MENU_LIVE}" ]; then
-        wprintf "   - Init pacman keyring. This will take a while..."
-        chroot "${ROOT}" dirmngr </dev/null
-        chroot "${ROOT}" pacman-key --init
-        chroot "${ROOT}" pacman-key --refresh-keys
-        chroot "${ROOT}" pacman-key --populate archlinux
-        chroot "${ROOT}" pacman -Syy
-    fi
+    chroot "${ROOT}" dirmngr </dev/null
+    chroot "${ROOT}" pacman-key --init
+    chroot "${ROOT}" pacman-key --refresh-keys
+    chroot "${ROOT}" pacman-key --populate archlinux
+    chroot "${ROOT}" pacman -Syy
 
     case "${menu_opt_how}" in
+        "${MENU_LIVE}")
+            mode="-l"
+            ;;
+        "${MENU_REPO}")
+            mode="-r"
+            ;;
+        "${MENU_BLACKMAN}")
+            mode="-b"
+            ;;
+    esac
+
+    case "${menu_opt_where}" in
         "${MENU_CHROOT}")
             chroot "${ROOT}" "/bin/chroot-install" "${mode}" -D "${HD}" -R "${root_part}" "$(${LUKS} && printf '%sL' '-')" -c
             ;;
@@ -521,7 +546,7 @@ install_chroot_script()
     esac
 
     # cleaning up
-    rm -rf "${ROOT}/bin/${chroot_file}"
+    #rm -rf "${ROOT}/bin/${chroot_file}"
 
     return "${SUCCESS}"
 
@@ -551,44 +576,6 @@ dump_live()
     wprintf "[*] dump done"
 
     return "${SUCCESS}"
-}
-
-run_chroot_script()
-{
-    wprintf "[*] Installing BlackArch Linux"
-
-    # if live not need to do this
-    if [ "${menu_opt_how}" != "${MENU_LIVE}" ] &&
-       [ "${menu_opt_how}" != "${MENU_CHROOT}" ]; then
-        wprintf "[+] Generating pacman.conf"
-        cp -Rf /etc/pacman* "${ROOT}/etc/"
-
-        wprintf "[+] Generating resolv.conf"
-        cp /etc/resolv.conf "${ROOT}/etc/"
-    fi
-
-    wprintf "[+] Installing chroot system..."
-    if [ -d shell ]; then
-        cp -f shell/etc/issue "${ROOT}/etc/"
-        cp -R shell/ "${ROOT}/mnt/"
-    else
-        cp -f /usr/share/blackarch-install-scripts/shell/etc/issue "${ROOT}/etc/"
-        cp -R /usr/share/blackarch-install-scripts/shell "${ROOT}/mnt/"
-    fi
-    # setup hostname
-    sed -i 's/localhost/blackarch/g' "${ROOT}/etc/hosts"
-
-    case "${menu_opt_how}" in
-        "${MENU_LIVE}")
-            install_chroot_script -l
-            ;;
-        "${MENU_REPO}")
-            install_chroot_script -r
-            ;;
-        "${MENU_BLACKMAN}")
-            install_chroot_script -b
-            ;;
-    esac
 }
 
 # install the system
@@ -643,7 +630,7 @@ install_chroot()
 
     [ -z "${find_tarball}" ] && download_bootstrap
 
-    wprintf "[*] Decompressing Archlinux..."
+    header "Decompressing Archlinux..."
     tar -zxvf "$(find * -maxdepth 0 -name archlinux*tar.gz)" &> /dev/null
     mv "root.$(uname -m)" "${ROOT}"
     wprintf "[*] Setting up Archlinux..."
