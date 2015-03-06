@@ -133,7 +133,6 @@ usage()
     cat << EOF
 usage: $0 <arg> | <misc>
 OPTIONS:
-    -l: live-iso install
     -r: repository install
     -b: blackman install
     -d: device target [/dev/sda]
@@ -272,8 +271,7 @@ install_packages_repo()
     pacman -S blackarch
 
     # X11 related, wms, configs
-    if [ -z "${CHROOT_INSTALL}" ] ||
-       [ "${menu_opt}" != "live" ]; then
+    if [ -z "${CHROOT_INSTALL}" ]; then
         pacman -S blackarch-config-awesome blackarch-config-fluxbox \
          blackarch-config-lxdm blackarch-config-openbox fluxbox openbox awesome \
         spectrwm blackarch-dwm i3-wm wmii
@@ -418,10 +416,6 @@ install()
     header "package installation"
 
     case "${menu_opt}" in
-        "live")
-            header "system update"
-            update_system
-            ;;
         "repository")
             header "system update"
             update_system
@@ -464,12 +458,9 @@ install()
 # parse command line options
 get_opts()
 {
-    while getopts lrbcD:R:LvVH flags
+    while getopts rbcD:R:LvVH flags
     do
         case "${flags}" in
-            l)
-                opt_arg="live"
-                ;;
             r)
                 opt_arg="repository"
                 ;;
