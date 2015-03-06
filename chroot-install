@@ -289,6 +289,14 @@ install_packages_repo()
 # install grub bootloader
 install_grub()
 {
+    header "grub installation"
+
+    printf "%s[?] install Grub. [y/N]: " \
+            "${WHITE}"; read a
+    if [ "${a}" != "y" ] || [ "${a}" != "Y" ]; then
+        return "${SUCCESS}"
+    fi
+
     pacman -S grub --noconfirm --needed
     grub-install --target=i386-pc "${HD}"
     grub-mkconfig -o /boot/grub/grub.cfg
@@ -447,7 +455,6 @@ install()
         #header "X configuration"
         #configure_X
 
-        header "grub installation"
         install_grub
     fi
 
