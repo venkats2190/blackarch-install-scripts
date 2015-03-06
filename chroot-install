@@ -272,9 +272,13 @@ install_packages_repo()
 
     # X11 related, wms, configs
     if [ -z "${CHROOT_INSTALL}" ]; then
-        pacman -S blackarch-config-awesome blackarch-config-fluxbox \
-         blackarch-config-lxdm blackarch-config-openbox fluxbox openbox awesome \
-        spectrwm blackarch-dwm i3-wm wmii
+        printf "%s[?] install Blackarch WM (e.g. lxdm, fluxbox, dwm)[y/N]: " \
+            "${WHITE}"; read a
+        if [ "${a}" == "y" ] || [ "${a}" == "Y" ]; then
+            pacman -S blackarch-config-awesome blackarch-config-fluxbox \
+            blackarch-config-lxdm blackarch-config-openbox fluxbox openbox awesome \
+            spectrwm blackarch-dwm i3-wm wmii --noconfirm
+        fi
     fi
 
     return "${SUCCESS}"
