@@ -152,8 +152,13 @@ EOF
 # leet banner, very important
 banner()
 {
-    printf "%s--==[ blackarch-install %s ]==--%s\n" \
-        "${YELLOW}" "${VERSION}" "${NC}"
+    columns="$(tput cols)"
+    _str="--==[ blackarch-install ${VERSION} ]==--"
+    echo "${_str}"|while IFS= read -r line; do
+        printf "%s%*s\n%s" \
+            "${YELLOW}" $(( (${#line} + columns) / 2)) \
+            "$line" "${NC}"
+    done
 
     return "${SUCCESS}"
 }
