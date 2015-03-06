@@ -343,6 +343,8 @@ set_passwd()
 # add and configure users
 configure_users()
 {
+    header "user configuration"
+
     printf "%s" "${WHITE}"
 
     printf "[*] setting up root password\n"
@@ -375,6 +377,8 @@ configure_users()
 # not used atm
 generate_initramfs()
 {
+    header "initramfs"
+
     sed -i 's/block filesystems/block encrypt filesystems/' /etc/mkinitcpio.conf
 
     mkinitcpio -p linux
@@ -386,6 +390,7 @@ generate_initramfs()
 # set system hostname
 set_hostname()
 {
+    header "hostname setup"
 
     printf "%s" "${WHITE}"
 
@@ -407,6 +412,8 @@ set_hostname()
 # configure X related things
 #configure_X()
 #{
+    #header "X configuration"
+
     # enable display manager
     #systemctl enable lxdm
 
@@ -439,20 +446,16 @@ install()
             ;;
     esac
 
-    header "user configuration"
     configure_users
 
     if [ -z "${CHROOT_INSTALL}" ]; then
-        header "initramfs"
         "${LUKS}" && generate_initramfs
 
-        header "hostname setup"
         set_hostname
 
         # set keymaps choosed before silently
         printf "KEYMAP=%s\n" "${KEYMAPS}" > /etc/vconsole.conf
 
-        #header "X configuration"
         #configure_X
 
         install_grub

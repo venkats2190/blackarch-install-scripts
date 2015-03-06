@@ -175,6 +175,8 @@ check_env()
 # update the system
 update_system()
 {
+    header "system update"
+
     if [ "`uname -m`" = "x86_64" ]; then
         wprintf "[*] enabling multilib in /etc/pacman.conf"
         if grep -q "#\[multilib\]" /etc/pacman.conf
@@ -195,9 +197,26 @@ update_system()
 }
 
 
+configure_hard_drive()
+{
+    header "hard drive configuration"
+
+    ask_for_luks
+    setup_filesystem
+    run_cfdisk
+    get_partitions
+    format_partition
+    mount_filesystem
+
+    return "${SUCCESS}"
+}
+
+
 # set keymaps
 set_keymaps()
 {
+    header "keymap configuration"
+
     printf "%s" "${WHITE}"
 
     #printf "[*] running locale-gen, please wait...\n"
@@ -474,6 +493,8 @@ mount_filesystem()
 # install ArchLinux base packages
 install_base_packages()
 {
+    header "package installation"
+
     wprintf "[*] installing ArchLinux base packages"
 
     pacstrap -c "${ROOT}" base
@@ -557,21 +578,12 @@ run_chroot_script()
 # install the system
 install_drive()
 {
-    header "keymap configuration"
     set_keymaps
 
-    header "system update"
     update_system
 
-    header "hard drive configuration"
-    ask_for_luks
-    setup_filesystem
-    run_cfdisk
-    get_partitions
-    format_partition
-    mount_filesystem
+    configure_hard_drive
 
-    header "package installation"
     install_base_packages
 
     return "${SUCCESS}"
