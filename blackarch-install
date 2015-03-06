@@ -283,14 +283,10 @@ run_cfdisk()
 get_partitions()
 {
     # * BOOT
-
-    if confirm "%s[?] created a boot partition [y/N]: " "${WHITE}"; then
-        if [ "${LUKS}" == "true" ]; then
+    if confirm "[?] created a boot partition [y/N]: "; then
+        [ "${LUKS}" == "true" ] && \
             warn "using luks encryption without boot partition will fail"
-        fi
-    fi
 
-    if confirm; then
         BOOT="true"
         printf "%s[?] boot partition number [%s]: " "${WHITE}" "${default_part}"
         read a
