@@ -522,6 +522,7 @@ run_chroot_script()
     chroot "${ROOT}" pacman-key --init
     chroot "${ROOT}" pacman-key --refresh-keys
     chroot "${ROOT}" pacman-key --populate archlinux
+    chroot "${ROOT}" pacman-db-upgrade
     chroot "${ROOT}" pacman -Syy
 
     case "${menu_opt_how}" in
