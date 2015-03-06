@@ -285,7 +285,7 @@ get_partitions()
     printf "%s" "${WHITE}"
 
     # * BOOT
-    if confirm "[?] created a boot partition [y/N]: "; then
+    if confirm "[?] created a BOOT partition [y/N]: "; then
         [ "${LUKS}" == "true" ] && \
             warn "using luks encryption without boot partition will fail"
 
@@ -311,7 +311,7 @@ get_partitions()
     a=""
 
     # * SWAP
-    if confirm "[?] created a swap partition [y/N]: " "${WHITE}"; then
+    if confirm "[?] created a SWAP partition [y/N]: " "${WHITE}"; then
         SWAP="true"
         printf "\n [?] swap partition number [%s]:" "${default_part}"; read a
         if [ "${a}" != "" ]; then
@@ -337,6 +337,8 @@ get_partitions()
     if [ "${a}" != "" ]; then
         root_type="${a}"
     fi
+
+    printf "%s" "${NC}"
 
     return "${SUCCESS}"
 }
