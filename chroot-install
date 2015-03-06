@@ -209,8 +209,12 @@ update_system()
         warn "mirror selection failed - we go with default one"
     fi
 
+    # keep white style with strap.sh
+    printf "%s" "${WHITE}"
     curl -s http://blackarch.org/strap.sh | bash
-    #debug
+    printf "%s" "${NC}"
+
+    #debug - under dev
     #exit
     #curl -s -O \
     #     'http://blackarch.org/keyring/blackarch-keyring.pkg.tar.xz{,.sig}'
