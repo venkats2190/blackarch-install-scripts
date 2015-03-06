@@ -208,6 +208,13 @@ update_system()
         warn "mirror selection failed - we go with default one"
     fi
 
+    if ! grep -q "blackarch" /etc/pacman.conf; then
+        printf '[blackarch]\nServer = %s\n' "${BLACKARCH_REPO_URL}" \
+            >> /etc/pacman.conf
+    else
+        sed -i "/\[blackarch\]/{ n;s?Server.*?Server = ${BLACKARCH_REPO_URL}?; }" /etc/pacman.conf
+    fi
+
     # keep white style with strap.sh
     printf "%s" "${WHITE}"
     curl -s http://blackarch.org/strap.sh | bash
@@ -236,13 +243,6 @@ update_system()
 
     #rm -rf blackarch-keyring.*
     #exit
-
-    if ! grep -q "blackarch" /etc/pacman.conf; then
-        printf '[blackarch]\nServer = %s\n' "${BLACKARCH_REPO_URL}" \
-            >> /etc/pacman.conf
-    else
-        sed -i "/\[blackarch\]/{ n;s?Server.*?Server = ${BLACKARCH_REPO_URL}?; }" /etc/pacman.conf
-    fi
 
     pacman -Syyu --noconfirm
 
