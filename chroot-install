@@ -267,9 +267,10 @@ install_packages_blackman()
 # install blackarch packages
 install_packages_repo()
 {
-    # repo
+    header "[*] Blackarch packages installation"
     pacman -S blackarch
 
+    header "[*] Blackarch WM installation"
     # X11 related, wms, configs
     if [ -z "${CHROOT_INSTALL}" ]; then
         printf "%s[?] install Blackarch WM (e.g. lxdm, fluxbox, dwm)[y/N]: " \
