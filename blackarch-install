@@ -692,6 +692,31 @@ install_menu_where()
     return "${SUCCESS}"
 }
 
+# parse command line options
+get_opts()
+{
+    while getopts vVH flags
+    do
+        case "${flags}" in
+            v)
+                VERBOSE="/dev/stdout"
+                ;;
+            V)
+                printf "%s\n" "${VERSION}"
+                exit "${SUCCESS}"
+                ;;
+            H)
+                usage
+                ;;
+            *)
+                err "WTF?! mount /dev/brain"
+                ;;
+        esac
+    done
+
+    return "${SUCCESS}"
+}
+
 #confirm user inputted yYnN.
 confirm()
 {
