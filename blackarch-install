@@ -282,6 +282,8 @@ run_cfdisk()
 # get selected partitions
 get_partitions()
 {
+    printf "%s" "${WHITE}"
+
     # * BOOT
     if confirm "[?] created a boot partition [y/N]: "; then
         [ "${LUKS}" == "true" ] && \
@@ -309,7 +311,7 @@ get_partitions()
     a=""
 
     # * SWAP
-    if confirm "%s[?] created a swap partition [y/N]: " "${WHITE}"; then
+    if confirm "[?] created a swap partition [y/N]: " "${WHITE}"; then
         SWAP="true"
         printf "\n [?] swap partition number [%s]:" "${default_part}"; read a
         if [ "${a}" != "" ]; then
@@ -322,7 +324,7 @@ get_partitions()
     fi
 
     # * ROOT
-    printf "%s[?] root partition number [%s]: " "${WHITE}" "${default_part}"
+    printf "[?] root partition number [%s]: " "${default_part}"
     read a
     if [ "${a}" != "" ]; then
         root_part="${HD}${a}"
@@ -330,7 +332,7 @@ get_partitions()
         root_part="${HD}${default_part}"
     fi
 
-    printf "%s[?] fs type of root partition [ext4]: " "${WHITE}"
+    printf "[?] fs type of root partition [ext4]: "
     read a
     if [ "${a}" != "" ]; then
         root_type="${a}"
