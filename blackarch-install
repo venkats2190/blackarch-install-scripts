@@ -37,9 +37,8 @@ MENU_DRIVE="1"
 MENU_CHROOT="2"
 
 # Menu How CONST
-MENU_LIVE="1"
-MENU_REPO="2"
-MENU_BLACKMAN="3"
+MENU_REPO="1"
+MENU_BLACKMAN="2"
 
 # Set up defaults partitioning vars
 boot_type="ext2"
@@ -190,7 +189,7 @@ update_system()
         fi
     fi
 
-    pacman -Syy --noconfirm "${LIVE+-u}"
+    pacman -Syy --noconfirm
 
     return "${SUCCESS}"
 }
@@ -531,9 +530,6 @@ run_chroot_script()
     chroot "${ROOT}" pacman -Syy
 
     case "${menu_opt_how}" in
-        "${MENU_LIVE}")
-            mode="-l"
-            ;;
         "${MENU_REPO}")
             mode="-r"
             ;;
@@ -558,32 +554,6 @@ run_chroot_script()
 
 }
 
-# only for live mode
-dump_live()
-{
-    t=7
-    remaining=7
-    SECONDS=0
-
-    while sleep .2; do
-        printf '\r[*] down the rabbit hole we go '"${RED}$remaining"${NC}' '
-
-        if (( (remaining=t-SECONDS) <=0 )); then
-            printf '\rseconds remaining to proceed' 0
-            break
-        fi
-    done
-
-    cp -aRpv /bin /etc /home /lib /lib64 /opt /root /srv /usr /var /tmp "${ROOT}"
-
-    # cleaning files - it will be create later
-    rm -rf "${ROOT}/etc/{group, passwd, shadow*, gshadow*}"
-
-    wprintf "[*] dump done"
-
-    return "${SUCCESS}"
-}
-
 # install the system
 install_drive()
 {
@@ -601,13 +571,8 @@ install_drive()
     format_partition
     mount_filesystem
 
-    if [ "${menu_opt_how}" = "${MENU_LIVE}" ]; then
-        header "clone live ISO"
-        dump_live
-    else
-        header "package installation"
-        install_base_packages
-    fi
+    header "package installation"
+    install_base_packages
 
     return "${SUCCESS}"
 }
@@ -653,12 +618,10 @@ help_menu_how()
 {
     header "Welcome to BlackArch Linux Installation"
 
-    wprintf "1. Clone Live ISO"
-    wprintf "   - Copy the Live ISO environment directly onto disk."
-    wprintf "2. Install from official repository of BlackArch"
+    wprintf "1. Install from official repository of BlackArch"
     wprintf "   - Install Arch Linux from the official Arch repositories"
     wprintf "     and install tools from the BlackArch package repository."
-    wprintf "3. Install from sources using blackman"
+    wprintf "2. Install from sources using blackman"
     wprintf "   - Install Arch Linux from the official Arch"
     wprintf "     repositories and compile the BlackArch tools"
     wprintf "     from source."
@@ -670,17 +633,15 @@ help_menu_how()
 # print installer menu and get chosen options
 install_menu_how()
 {
-    while ! [ "${menu_opt_how}" = "${MENU_LIVE}" \
-           -o "${menu_opt_how}" = "${MENU_REPO}" \
-           -o "${menu_opt_how}" = "${MENU_BLACKMAN}" ]; do
+    while [ ! "${menu_opt_how}" = "${MENU_REPO}" || \
+              "${menu_opt_how}" = "${MENU_BLACKMAN}" ]; do
         header "Welcome to BlackArch Linux Installation"
 
         printf "%s" "${WHITE}"
 
         printf "[*] Installation modes:\n"
-        printf "    1. Clone Live ISO\n"
-        printf "    2. Install from package repository\n"
-        printf "    3. Install from sources using blackman\n"
+        printf "    1. Install from package repository\n"
+        printf "    2. Install from sources using blackman\n"
         printf "Make a choice [h - help]: "; read menu_opt_how
 
         [ "${menu_opt_how}" == "h" ] && help_menu_how
@@ -774,13 +735,7 @@ main()
 
     if [ "${SEC_ENABLE}" = "false" ]; then
         install_menu_how
-        # dont show chroot mode if we are installing from live ISO
-        # and set MENU_DRIVE
-        if [ "${menu_opt_how}" != "${MENU_LIVE}" ]; then
-            install_menu_where
-        else
-            menu_opt_where="${MENU_DRIVE}"
-        fi
+        install_menu_where
 
         if [ "${menu_opt_where}" == "${MENU_DRIVE}" ]; then
             install_drive
