@@ -633,7 +633,7 @@ help_menu_how()
 # print installer menu and get chosen options
 install_menu_how()
 {
-    while [ ! "${menu_opt_how}" = "${MENU_REPO}" || \
+    while ! [ "${menu_opt_how}" = "${MENU_REPO}" -o \
               "${menu_opt_how}" = "${MENU_BLACKMAN}" ]; do
         header "Welcome to BlackArch Linux Installation"
 
@@ -664,7 +664,7 @@ help_menu_where()
     wprintf "     distros (e.g. Debian, Ubuntu, Gentoo)"
     wprintf "Press any key to continue...."; read _tmp
 
-    return "${SUCCESS}"
+    return
 }
 
 install_menu_where()
@@ -688,31 +688,6 @@ install_menu_where()
     fi
 
     printf "%s" "${NC}"
-
-    return "${SUCCESS}"
-}
-
-# parse command line options
-get_opts()
-{
-    while getopts vVH flags
-    do
-        case "${flags}" in
-            v)
-                VERBOSE="/dev/stdout"
-                ;;
-            V)
-                printf "%s\n" "${VERSION}"
-                exit "${SUCCESS}"
-                ;;
-            H)
-                usage
-                ;;
-            *)
-                err "WTF?! mount /dev/brain"
-                ;;
-        esac
-    done
 
     return "${SUCCESS}"
 }
