@@ -195,7 +195,7 @@ select_ba_repo()
     fi
 
     # cleaning up
-    RM -RF "${mirror_file}"
+    rm -rf "${mirror_file}"
 
     return "${SUCCESS}"
 }
