@@ -363,6 +363,28 @@ set_passwd()
     return "${SUCCESS}"
 }
 
+# add and configure users
+configure_vbox()
+{
+    header "virtualbox configuration"
+
+    printf "%s" "${WHITE}"
+
+    printf "[?] Install VirtualBox packages?[y/N]"; read a
+    if [ "${a}" == "y" ] || [ "${a}" == "Y" ]; then
+        pacman -S virtualbox-guest-utils virtualbox-guest-modules  --noconfirm
+        echo vboxguest >> /etc/modules-load.d/virtualbox.conf
+        echo vboxsf >> /etc/modules-load.d/virtualbox.conf
+        echo vboxvideo >> /etc/modules-load.d/virtualbox.conf
+        groupadd vboxsf
+        systemctl enable vboxservice
+        systemctl start vboxservice
+    fi
+
+    printf "%s" "${NC}"
+
+    return "${SUCCESS}"
+}
 
 # add and configure users
 configure_users()
@@ -470,6 +492,7 @@ install()
             ;;
     esac
 
+    configure_vbox
     configure_users
 
     if [ -z "${CHROOT_INSTALL}" ]; then
