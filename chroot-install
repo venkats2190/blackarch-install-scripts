@@ -302,6 +302,15 @@ install_packages_repo()
             # configure fluxbox
             rm -rf /usr/share/fluxbox
             mv /usr/share/fluxbox-blackarch /usr/share/fluxbox
+            # configure openbox
+            rm -rf /etc/xdg/openbox
+            mv /etc/xdg/openbox-blackarch /etc/xdg/openbox
+            mv /usr/share/thems/blackarch/openbox-3-blackarch \
+               /usr/share/themes/blackarch/openbox-3
+            # configure awesome
+            rm -rf /etc/xdg/awesome/rc.lua
+            mv /etc/xdg/awesome/rc.lua.blackarch /etc/xdg/awesome/rc.lua
+
         fi
     fi
 
@@ -369,7 +378,7 @@ configure_vbox()
 
     printf "%s" "${WHITE}"
 
-    printf "[?] Install VirtualBox packages?[y/N]: "; read a
+    printf "[?] Install VirtualBox packages [y/N]: "; read a
     if [ "${a}" == "y" ] || [ "${a}" == "Y" ]; then
         pacman -S virtualbox-guest-utils virtualbox-guest-modules  --noconfirm
         echo vboxguest >> /etc/modules-load.d/virtualbox.conf
@@ -510,6 +519,7 @@ install()
     # sync hd
     sync
 
+    header "Blackarch Installed Successfully!"
     printf "\n%s[*] BlackArch Linux ready! Enjoy!%s\n" "${RED}" "${NC}"
 
     return "${SUCCESS}"
