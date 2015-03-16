@@ -742,8 +742,10 @@ confirm()
     local r
       until [[ $r = [YyNn] ]]; do
       read -p "$1" r
+      printf "%s" "${RED}"
       done
-      [[ $r == [Yy] ]]
+     printf "${WHITE}"
+     [[ $r == [Yy] ]]
 }
 
 # controller and program flow
