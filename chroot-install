@@ -485,13 +485,13 @@ install()
             header "system update"
             update_system
             install_packages_repo
+            configure_vbox
             ;;
         "blackman")
             install_packages_blackman
             ;;
     esac
 
-    configure_vbox
     configure_users
 
     if [ -z "${CHROOT_INSTALL}" ]; then
