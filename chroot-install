@@ -293,7 +293,15 @@ install_packages_repo()
             xf86-video-tdfx xf86-video-trident xf86-video-tseng xf86-video-v4l \
             xf86-video-vesa xf86-video-vmware xf86-video-voodoo --noconfirm
             pacman -S xterm --noconfirm
-            systemctl enable lxdm
+            # configure lxdm
+            #systemctl enable lxdm
+            rm -rf /etc/lxdm /usr/share/lxdm /usr/share/xsessions
+            mv /etc/lxdm-blackarch /etc/lxdm
+            mv /usr/share/lxdm-blackarch /usr/share/lxdm
+            mv /usr/share/xsessions-blackarch /usr/share/xsessions
+            # configure fluxbox
+            rm -rf /usr/share/fluxbox
+            mv /usr/share/fluxbox-blackarch /usr/share/fluxbox
         fi
     fi
 
