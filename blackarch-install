@@ -285,10 +285,18 @@ check_mkfs_status()
 run_cfdisk()
 {
     default_part="1"
+    local a=0
 
-    wprintf "[*] create new partitions with cfdisk %s(root, optional: boot and swap)" "${RED}"
+    printf "%s" "${WHITE}"
+
+    printf "[?] create new partitions with cfdisk (root, optional: boot and swap)\n"
+
+    # TODO: help
+    #while [ "${a}" != 'y' ] || [
     sleep 3
     cfdisk "${HD}"
+
+    printf "%s" "${NC}"
 
     if [ "${?}" != "0" ]; then
         cri "error with cfdisk - run install again"
@@ -575,8 +583,7 @@ run_chroot_script()
 
 }
 
-# install the system
-install_drive()
+install_drive_mode()
 {
     set_keymaps
 
@@ -605,7 +612,7 @@ download_bootstrap()
     return "${SUCCESS}"
 }
 
-install_chroot()
+install_chroot_mode()
 {
     find_tarball=$(find * -maxdepth 0 -name archlinux*tar.gz)
 
@@ -750,9 +757,9 @@ main()
         install_menu_where
 
         if [ "${menu_opt_where}" == "${MENU_DRIVE}" ]; then
-            install_drive
+            install_drive_mode
         else
-            install_chroot
+            install_chroot_mode
         fi
         run_chroot_script
      else

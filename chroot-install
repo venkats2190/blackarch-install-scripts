@@ -182,17 +182,20 @@ select_ba_repo()
 
     printf "%s[?] select mirror number: " "${WHITE}"; read a
 
-    if [ "${a}" -gt "$(wc -l < ${mirror_file})" ]; then
+    # bugfix: detected chars added sometimes - clear chars
+    _a=$(printf "%s" "${a}"|sed 's/[a-z]//Ig')
+
+    if [ "${_a}" -gt "$(wc -l < ${mirror_file})" ]; then
         # BLACKARCH_REPO_URL gets the default one - choose better next time ;)
         wprintf "[*] you fucked up man - we select BlackArch for you..."
     else
-        BLACKARCH_REPO_URL=$(sed -n "${a}p" "${mirror_file}"|cut -d"|" -f2)
+        BLACKARCH_REPO_URL=$(sed -n "${_a}p" "${mirror_file}"|cut -d"|" -f2)
         wprintf "   -> mirror from '%s' selected" \
-            "$(sed -n "${a}p" "${mirror_file}"|cut -d"|" -f3)"
+            "$(sed -n "${_a}p" "${mirror_file}"|cut -d"|" -f3)"
     fi
 
     # cleaning up
-    rm -rf "${mirror_file}"
+    RM -RF "${mirror_file}"
 
     return "${SUCCESS}"
 }
@@ -293,27 +296,28 @@ install_grub()
 
     printf "%s[?] install Grub. [y/N]: " \
             "${WHITE}"; read a
-    if [ "${a}" != "y" ] || [ "${a}" != "Y" ]; then
-        return "${SUCCESS}"
+
+    if [ "${a}" == "y" ] || [ "${a}" == "Y" ]; then
+
+        pacman -S grub --noconfirm --needed
+        grub-install --target=i386-pc "${HD}"
+        grub-mkconfig -o /boot/grub/grub.cfg
+
+        mv /tmp/splash.png /boot/grub/
+        printf 'GRUB_BACKGROUND="/boot/grub/splash.png"\n' >> /etc/default/grub
+        # update splash.png
+        grub-mkconfig -o /boot/grub/grub.cfg
+
+        sed -i 's/Arch Linux/BlackArch Linux/' /boot/grub/grub.cfg
+
+        if [ "${LUKS}" == "true" ]; then
+            sed -i "s|quiet|cryptdevice=${ROOT_PART}:cryptroot root=/dev/mapper/cryptroot|" /etc/default/grub
+            sed -i 's|"Arch"|"BlackArch"|' /etc/default/grub
+            #sed -i "s|rw  quiet|rw cryptdevice=${ROOT_PART}:cryptroot|" \
+            #  /boot/grub/grub.cfg
+        fi
+
     fi
-
-    pacman -S grub --noconfirm --needed
-    grub-install --target=i386-pc "${HD}"
-    grub-mkconfig -o /boot/grub/grub.cfg
-
-    mv /tmp/splash.png /boot/grub/
-
-    sed -i 's/Arch Linux/BlackArch Linux/' /boot/grub/grub.cfg
-
-    printf 'GRUB_BACKGROUND="/boot/grub/splash.png"\n' >> /etc/default/grub
-
-    if [ "${LUKS}" == "true" ]; then
-        sed -i "s|quiet|cryptdevice=${ROOT_PART}:cryptroot root=/dev/mapper/cryptroot|" /etc/default/grub
-        sed -i 's|"Arch"|"BlackArch"|' /etc/default/grub
-        #sed -i "s|rw  quiet|rw cryptdevice=${ROOT_PART}:cryptroot|" \
-        #  /boot/grub/grub.cfg
-    fi
-
     return "${SUCCESS}"
 }
 
