@@ -204,7 +204,7 @@ select_ba_repo()
 # update the system
 update_system()
 {
-    header "[*] adding BlackArch repository"
+    header "adding BlackArch repository"
 
     select_ba_repo
     if [ "${?}" = "${FAILURE}" ]; then
@@ -270,10 +270,10 @@ install_packages_blackman()
 # install blackarch packages
 install_packages_repo()
 {
-    header "[*] Blackarch packages installation"
+    header "Blackarch packages installation"
     pacman -S blackarch
 
-    header "[*] Blackarch WM installation"
+    header "Blackarch WM installation"
     # X11 related, wms, configs
     if [ -z "${CHROOT_INSTALL}" ]; then
         printf "%s[?] install Blackarch WM (e.g. lxdm, fluxbox, dwm)[y/N]: " \
@@ -294,7 +294,7 @@ install_packages_repo()
             xf86-video-vesa xf86-video-vmware xf86-video-voodoo --noconfirm
             pacman -S xterm --noconfirm
             # configure lxdm
-            #systemctl enable lxdm
+            systemctl enable lxdm
             rm -rf /etc/lxdm /usr/share/lxdm /usr/share/xsessions
             mv /etc/lxdm-blackarch /etc/lxdm
             mv /usr/share/lxdm-blackarch /usr/share/lxdm
@@ -314,7 +314,7 @@ install_grub()
 {
     header "grub installation"
 
-    printf "%s[?] install Grub. [y/N]: " \
+    printf "%s[?] install Grub [y/N]: " \
             "${WHITE}"; read a
 
     if [ "${a}" == "y" ] || [ "${a}" == "Y" ]; then
@@ -363,14 +363,13 @@ set_passwd()
     return "${SUCCESS}"
 }
 
-# add and configure users
 configure_vbox()
 {
     header "virtualbox configuration"
 
     printf "%s" "${WHITE}"
 
-    printf "[?] Install VirtualBox packages?[y/N]"; read a
+    printf "[?] Install VirtualBox packages?[y/N]: "; read a
     if [ "${a}" == "y" ] || [ "${a}" == "Y" ]; then
         pacman -S virtualbox-guest-utils virtualbox-guest-modules  --noconfirm
         echo vboxguest >> /etc/modules-load.d/virtualbox.conf
