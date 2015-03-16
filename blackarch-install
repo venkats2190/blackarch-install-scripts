@@ -744,7 +744,7 @@ confirm()
       read -p "$1" r
       printf "%s" "${RED}"
       done
-     printf "${WHITE}"
+     printf "%s" "${WHITE}"
      [[ $r == [Yy] ]]
 }
 
