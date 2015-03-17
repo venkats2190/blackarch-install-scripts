@@ -313,9 +313,6 @@ get_partitions()
 
     # * BOOT
     if confirm "[?] created a BOOT partition [y/N]: "; then
-        [ "${LUKS}" == "true" ] && \
-            warn "using luks encryption without boot partition will fail"
-
         BOOT="true"
         printf "%s[?] boot partition number [%s]: " "${WHITE}" "${default_part}"
         read a
@@ -332,6 +329,9 @@ get_partitions()
         fi
 
         ((default_part++))
+    else
+        [ "${LUKS}" == "true" ] && \
+            warn "using luks encryption without boot partition will fail"
     fi
 
 
