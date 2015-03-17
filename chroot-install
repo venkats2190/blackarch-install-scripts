@@ -276,13 +276,19 @@ install_packages_repo()
     header "Blackarch WM installation"
     # X11 related, wms, configs
     if [ -z "${CHROOT_INSTALL}" ]; then
-        printf "%s[?] install Blackarch WM (e.g. lxdm, fluxbox, dwm)[y/N]: " \
+        printf "%s[?] install Blackarch WM (e.g. lxdm, fluxbox, dwm) [y/N]: " \
             "${WHITE}"; read a
         if [ "${a}" == "y" ] || [ "${a}" == "Y" ]; then
-            pacman -S xorg-server xorg-xinit xorg-server-utils lxdm --noconfirm
-            pacman -S blackarch-config-awesome blackarch-config-fluxbox \
-            blackarch-config-lxdm blackarch-config-openbox fluxbox openbox awesome \
-            spectrwm blackarch-dwm i3-wm wmii --noconfirm
+            # xorg
+            pacman -S xorg-server xorg-xinit xorg-server-utils --noconfirm
+            # install/configure lxdm
+            pacman -S lxdm --noconfirm
+            systemctl enable lxdm
+            rm -rf /etc/lxdm /usr/share/lxdm /usr/share/xsessions
+            mv /etc/lxdm-blackarch /etc/lxdm
+            mv /usr/share/lxdm-blackarch /usr/share/lxdm
+            mv /usr/share/xsessions-blackarch /usr/share/xsessions
+            # xf86*
             pacman -S xf86-video-ark xf86-video-ast xf86-video-ati xf86-video-chips \
             xf86-video-cirrus xf86-video-dummy xf86-video-fbdev xf86-video-glint \
             xf86-video-i128 xf86-video-i740 xf86-video-intel xf86-video-mach64 \
@@ -292,13 +298,12 @@ install_packages_repo()
             xf86-video-sis xf86-video-sisimedia xf86-video-sisusb xf86-input-synaptics \
             xf86-video-tdfx xf86-video-trident xf86-video-tseng xf86-video-v4l \
             xf86-video-vesa xf86-video-vmware xf86-video-voodoo --noconfirm
+            # term
             pacman -S xterm --noconfirm
-            # configure lxdm
-            systemctl enable lxdm
-            rm -rf /etc/lxdm /usr/share/lxdm /usr/share/xsessions
-            mv /etc/lxdm-blackarch /etc/lxdm
-            mv /usr/share/lxdm-blackarch /usr/share/lxdm
-            mv /usr/share/xsessions-blackarch /usr/share/xsessions
+            # blackarch WM
+            pacman -S blackarch-config-awesome blackarch-config-fluxbox \
+            blackarch-config-lxdm blackarch-config-openbox fluxbox openbox awesome \
+            spectrwm blackarch-dwm i3-wm wmii --noconfirm
             # configure fluxbox
             rm -rf /usr/share/fluxbox
             mv /usr/share/fluxbox-blackarch /usr/share/fluxbox
@@ -310,7 +315,6 @@ install_packages_repo()
             # configure awesome
             rm -rf /etc/xdg/awesome/rc.lua
             mv /etc/xdg/awesome/rc.lua.blackarch /etc/xdg/awesome/rc.lua
-
         fi
     fi
 
@@ -380,10 +384,10 @@ configure_vbox()
 
     printf "[?] Install VirtualBox packages [y/N]: "; read a
     if [ "${a}" == "y" ] || [ "${a}" == "Y" ]; then
-        pacman -S virtualbox-guest-utils virtualbox-guest-modules  --noconfirm
-        echo vboxguest >> /etc/modules-load.d/virtualbox.conf
-        echo vboxsf >> /etc/modules-load.d/virtualbox.conf
-        echo vboxvideo >> /etc/modules-load.d/virtualbox.conf
+        pacman -S virtualbox-guest-utils \
+                  virtualbox-guest-modules  --noconfirm
+        printf "vboxguest\nvboxsf\nvboxvideo" \
+            >> /etc/modules-load.d/virtualbox.conf
         groupadd vboxsf
         systemctl enable vboxservice
         systemctl start vboxservice
@@ -462,26 +466,6 @@ set_hostname()
     return "${SUCCESS}"
 }
 
-
-# configure X related things
-#configure_X()
-#{
-    #header "X configuration"
-
-    # enable display manager
-    #systemctl enable lxdm
-
-    # WMs
-    #cp -r /usr/share/fluxbox-blackarch/* /usr/share/fluxbox
-    #cp /etc/xdg/awesome/rc.lua.blackarch /etc/xdg/awesome/rc.lua
-    #cp -r /etc/xdg/openbox-blackarch/* /etc/xdg/openbox
-    #cp /usr/share/themes/blackarch/openbox-3-blackarch/* \
-    #    /usr/share/themes/blackarch/openbox-3
-
-
-    #return "${SUCCESS}"
-#}
-
 # install the system
 install()
 {
@@ -511,8 +495,6 @@ install()
         # set keymaps choosed before silently
         printf "KEYMAP=%s\n" "${KEYMAPS}" > /etc/vconsole.conf
 
-        #configure_X
-
         install_grub
     fi
 
@@ -520,7 +502,7 @@ install()
     sync
 
     header "Blackarch Installed Successfully!"
-    printf "\n%s[*] BlackArch Linux ready! Enjoy!%s\n" "${RED}" "${NC}"
+    printf "\n%s[*] BlackArch Linux ready! Enjoy!%s\n\n\n" "${RED}" "${NC}"
 
     return "${SUCCESS}"
 }
