@@ -135,7 +135,10 @@ usage: $0 <arg> | <misc>
 OPTIONS:
     -r: repository install
     -b: blackman install
-    -d: device target [/dev/sda]
+    -D <hd>: device target [/dev/sda]
+    -R <hd>: root partition [/dev/sda2]
+    -L: luks flag
+    -k <keymap>: keymap
 MISC:
     -V: print version and exit
     -H: print help and exit
