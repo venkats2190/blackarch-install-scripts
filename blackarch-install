@@ -334,7 +334,6 @@ get_partitions()
             warn "using luks encryption without boot partition will fail"
     fi
 
-
     a=""
 
     # * SWAP
@@ -569,10 +568,14 @@ run_chroot_script()
 
     case "${menu_opt_where}" in
         "${MENU_CHROOT}")
-            chroot "${ROOT}" "/bin/chroot-install" "${mode}" -D "${HD}" -R "${root_part}" "$(${LUKS} && printf '%sL' '-')" -c
+            chroot "${ROOT}" "/bin/chroot-install" "${mode}" \
+                    -D "${HD}" -R "${root_part}" \
+                    "$(${LUKS} && printf '%sL' '-')" -c -k "${keymaps}"
             ;;
         *)
-            chroot "${ROOT}" "/bin/chroot-install" "${mode}" -D "${HD}" -R "${root_part}" "$(${LUKS} && printf '%sL' '-')"
+            chroot "${ROOT}" "/bin/chroot-install" "${mode}" \
+                   -D "${HD}" -R "${root_part}" \
+                   "$(${LUKS} && printf '%sL' '-')" -k "${keymaps}"
             ;;
     esac
 
