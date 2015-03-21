@@ -339,9 +339,6 @@ install_grub()
 
         mv /tmp/splash.png /boot/grub/
         printf 'GRUB_BACKGROUND="/boot/grub/splash.png"\n' >> /etc/default/grub
-        # update splash.png
-        grub-mkconfig -o /boot/grub/grub.cfg
-
         sed -i 's/Arch Linux/BlackArch Linux/' /boot/grub/grub.cfg
 
         if [ "${LUKS}" == "true" ]; then
@@ -349,8 +346,10 @@ install_grub()
             sed -i 's|"Arch"|"BlackArch"|' /etc/default/grub
             #sed -i "s|rw  quiet|rw cryptdevice=${ROOT_PART}:cryptroot|" \
             #  /boot/grub/grub.cfg
+            pacman -S linux --noconfirm
         fi
-
+        # update grub config
+        grub-mkconfig -o /boot/grub/grub.cfg
     fi
     return "${SUCCESS}"
 }
