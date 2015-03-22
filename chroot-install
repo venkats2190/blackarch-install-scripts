@@ -349,7 +349,6 @@ install_grub()
             sed -i 's|"Arch"|"BlackArch"|' /etc/default/grub
             #sed -i "s|rw  quiet|rw cryptdevice=${ROOT_PART}:cryptroot|" \
             #  /boot/grub/grub.cfg
-            pacman -S linux --noconfirm
         fi
         # update grub config
         grub-mkconfig -o /boot/grub/grub.cfg

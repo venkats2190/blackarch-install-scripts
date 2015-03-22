@@ -500,7 +500,7 @@ mount_filesystem()
 # install ArchLinux base packages
 install_base_packages()
 {
-    header "package installation"
+    header "base system installation"
 
     wprintf "[*] installing ArchLinux base packages"
 
