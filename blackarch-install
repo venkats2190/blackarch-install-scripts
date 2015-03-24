@@ -335,7 +335,8 @@ get_partitions()
     a=""
 
     # * SWAP
-    if confirm "\n[?] created a SWAP partition [y/n]: "; then
+    printf "\n"
+    if confirm "[?] created a SWAP partition [y/n]: "; then
         SWAP="true"
         printf "\n [?] swap partition number [%s]:" "${default_part}"; read a
         if [ "${a}" != "" ]; then
@@ -348,7 +349,7 @@ get_partitions()
     fi
 
     # * ROOT
-    printf "[?] root partition number [%s]: " "${default_part}"
+    printf "\n[?] root partition number [%s]: " "${default_part}"
     read a
     if [ "${a}" != "" ]; then
         root_part="${HD}${a}"
