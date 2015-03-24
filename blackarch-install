@@ -281,16 +281,15 @@ check_mkfs_status()
 }
 
 
-# run cfdisk and let the user play
-run_cfdisk()
+ask_cfdisk()
 {
     default_part="1"
     local a=0
 
-    printf "%s\n" "${WHITE}"
-
     "${LUKS}" &&
         warn "You must create a non-encrypted BOOT partition (>=100MB)"
+
+    printf "%s\n" "${WHITE}"
 
     if confirm "[?] create new partitions with cfdisk (root, optional: boot and swap). [y/n]:"; then
         # TODO: help
