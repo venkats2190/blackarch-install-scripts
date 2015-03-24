@@ -203,7 +203,7 @@ configure_hard_drive()
 
     ask_for_luks
     setup_filesystem
-    run_cfdisk
+    ask_cfdisk
     get_partitions
     format_partition
     mount_filesystem
