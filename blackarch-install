@@ -315,7 +315,7 @@ get_partitions()
     printf "%s" "${WHITE}"
 
     # * BOOT
-    if "${LUKS}" || confirm "[?] created a BOOT partition [y/N]: "; then
+    if "${LUKS}" || confirm "[?] created a BOOT partition [y/n]: "; then
         BOOT="true"
         printf "%s[?] boot partition number [%s]: " "${WHITE}" "${default_part}"
         read a
@@ -340,7 +340,7 @@ get_partitions()
     a=""
 
     # * SWAP
-    if confirm "[?] created a SWAP partition [y/N]: " "${WHITE}"; then
+    if confirm "[?] created a SWAP partition [y/n]: " "${WHITE}"; then
         SWAP="true"
         printf "\n [?] swap partition number [%s]:" "${default_part}"; read a
         if [ "${a}" != "" ]; then
@@ -388,7 +388,7 @@ format_partition()
 
     wprintf "   -> / %s with type %s" "${root_part}" "${root_type}"
 
-    printf "%s[?] are you sure [y/N]: " "${WHITE}";
+    printf "%s[?] are you sure [y/n]: " "${WHITE}";
     # safety checks
     if [ "${BOOT}" == "true" ]; then
       umount "${boot_part}" &> /dev/null
@@ -440,7 +440,7 @@ ask_for_luks()
 {
     printf "%s" "${WHITE}"
 
-    if confirm "[?] full encrypted root [y/N]: "; then
+    if confirm "[?] full encrypted root [y/n]: "; then
         LUKS="true"
 	    warn "root will be encrypted"
     else
