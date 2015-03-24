@@ -279,7 +279,7 @@ install_packages_repo()
     header "Blackarch WM installation"
     # X11 related, wms, configs
     if [ -z "${CHROOT_INSTALL}" ]; then
-        if confirm "[?] install Blackarch WM (e.g. lxdm, fluxbox, dwm) [y/n]:"; then
+        if confirm "[?] install Blackarch WM (e.g. lxdm, fluxbox, dwm) [y/n]: "; then
             # xorg
             pacman -S xorg-server xorg-xinit xorg-server-utils --noconfirm
             # xf86*
@@ -329,7 +329,7 @@ install_grub()
 {
     header "grub installation"
 
-    if confirm "[?] install Grub [y/n]:"; then
+    if confirm "[?] install Grub [y/n]: "; then
         pacman -S grub --noconfirm --needed
         grub-install --target=i386-pc "${HD}"
         grub-mkconfig -o /boot/grub/grub.cfg
@@ -407,7 +407,7 @@ configure_users()
     mv /tmp/shell/root/.bashrc /root/
     cp /root/.bashrc /root/.bash_profile
 
-    confirm "[?] setup a normal user account [y/n]: "; then
+    if confirm "[?] setup a normal user account [y/n]: "; then
         printf "[?] user name: "; read user
         useradd -m -p "" -g users \
             -G "adm,audio,floppy,log,network,rfkill,scanner,storage,optical,power,wheel" \

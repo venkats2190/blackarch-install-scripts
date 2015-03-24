@@ -402,7 +402,7 @@ format_partition()
             # format and encrypt root partition
             printf "[*] formatting root partiton"
             cryptsetup -y -v luksFormat "${root_part}"
-            printf "[*] opening encrypted partition\n"
+            printf "\n[*] opening encrypted partition\n"
             cryptsetup open "${root_part}" cryptroot
             "mkfs.${root_type}" -L root "/dev/mapper/cryptroot"
             check_mkfs_status
