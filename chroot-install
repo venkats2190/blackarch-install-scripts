@@ -279,9 +279,7 @@ install_packages_repo()
     header "Blackarch WM installation"
     # X11 related, wms, configs
     if [ -z "${CHROOT_INSTALL}" ]; then
-        printf "%s[?] install Blackarch WM (e.g. lxdm, fluxbox, dwm) [y/N]: " \
-            "${WHITE}"; read a
-        if [ "${a}" == "y" ] || [ "${a}" == "Y" ]; then
+        if confirm "[?] install Blackarch WM (e.g. lxdm, fluxbox, dwm) [y/n]:"; then
             # xorg
             pacman -S xorg-server xorg-xinit xorg-server-utils --noconfirm
             # xf86*
@@ -331,11 +329,7 @@ install_grub()
 {
     header "grub installation"
 
-    printf "%s[?] install Grub [y/N]: " \
-            "${WHITE}"; read a
-
-    if [ "${a}" == "y" ] || [ "${a}" == "Y" ]; then
-
+    if confirm "[?] install Grub [y/n]:"; then
         pacman -S grub --noconfirm --needed
         grub-install --target=i386-pc "${HD}"
         grub-mkconfig -o /boot/grub/grub.cfg
@@ -353,6 +347,7 @@ install_grub()
         # update grub config
         grub-mkconfig -o /boot/grub/grub.cfg
     fi
+
     return "${SUCCESS}"
 }
 
@@ -384,8 +379,7 @@ configure_vbox()
 
     printf "%s" "${WHITE}"
 
-    printf "[?] Install VirtualBox packages [y/N]: "; read a
-    if [ "${a}" == "y" ] || [ "${a}" == "Y" ]; then
+    if confirm "[?] Install VirtualBox packages [y/n]: "; then
         pacman -S virtualbox-guest-utils \
                   virtualbox-guest-modules  --noconfirm
         printf "vboxguest\nvboxsf\nvboxvideo" \
@@ -413,8 +407,7 @@ configure_users()
     mv /tmp/shell/root/.bashrc /root/
     cp /root/.bashrc /root/.bash_profile
 
-    printf "[?] setup a normal user account [y/N]: "; read a
-    if [ "${a}" == "y" ] || [ "${a}" == "Y" ]; then
+    confirm "[?] setup a normal user account [y/n]: "; then
         printf "[?] user name: "; read user
         useradd -m -p "" -g users \
             -G "adm,audio,floppy,log,network,rfkill,scanner,storage,optical,power,wheel" \
@@ -556,6 +549,17 @@ get_opts()
     return "${SUCCESS}"
 }
 
+#confirm user inputted yYnN.
+confirm()
+{
+    local r
+      until [[ $r = [YyNn] ]]; do
+      read -p "$1" r
+      printf "%s" "${RED}"
+      done
+     printf "%s" "${WHITE}"
+     [[ $r == [Yy] ]]
+}
 
 # controller and program flow
 main()
