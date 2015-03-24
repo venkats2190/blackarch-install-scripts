@@ -293,7 +293,7 @@ install_packages_repo()
             xf86-video-s3 xf86-video-s3virge xf86-video-savage xf86-video-siliconmotion \
             xf86-video-sis xf86-video-sisimedia xf86-video-sisusb xf86-input-synaptics \
             xf86-video-tdfx xf86-video-trident xf86-video-tseng xf86-video-v4l \
-            xf86-video-vesa xf86-video-vmware xf86-video-voodoo --noconfirm
+            xf86-video-vesa xf86-video-vmware xf86-video-voodoo xf86-input-synaptics --noconfirm
             # install lxdm
             pacman -S lxdm --noconfirm
             # term
