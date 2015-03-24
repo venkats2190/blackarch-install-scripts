@@ -1,3 +1,4 @@
+[X] Force user to create Boot partition if LUKS enable
 [ ] Chroot Feature - give support for armv*
 [ ] Installation Resume
 [ ] Clean up on failure -  it doesn't unmount or run cryptsetup close on failure

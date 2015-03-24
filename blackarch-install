@@ -155,7 +155,7 @@ banner()
     _str="--==[ blackarch-install ${VERSION} ]==--"
     echo "${_str}"|while IFS= read -r line; do
         printf "%s%*s\n%s" \
-            "${YELLOW}" $(( (${#line} + columns) / 2)) \
+            "${WHITE}" $(( (${#line} + columns) / 2)) \
             "$line" "${NC}"
     done
 
@@ -289,7 +289,10 @@ run_cfdisk()
 
     printf "%s" "${WHITE}"
 
-    printf "[?] create new partitions with cfdisk (root, optional: boot and swap)\n"
+    "${LUKS}" &&
+        warn "You must create a non-encrypted BOOT partition (>=100MB)"
+
+    printf "[*] create new partitions with cfdisk (root, optional: boot and swap)\n"
 
     # TODO: help
     #while [ "${a}" != 'y' ] || [
@@ -312,7 +315,7 @@ get_partitions()
     printf "%s" "${WHITE}"
 
     # * BOOT
-    if confirm "[?] created a BOOT partition [y/N]: "; then
+    if "${LUKS}" || confirm "[?] created a BOOT partition [y/N]: "; then
         BOOT="true"
         printf "%s[?] boot partition number [%s]: " "${WHITE}" "${default_part}"
         read a
@@ -329,10 +332,9 @@ get_partitions()
         fi
 
         ((default_part++))
-    else
-        [ "${LUKS}" == "true" ] && \
-            warn "using luks encryption without boot partition will fail"
     fi
+
+    "${LUKS}" && [ -z "${boot_part}" ] && cri "LUKS partition without BOOT partition wont boot"
 
     a=""
 
