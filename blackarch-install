@@ -292,16 +292,15 @@ run_cfdisk()
     "${LUKS}" &&
         warn "You must create a non-encrypted BOOT partition (>=100MB)"
 
-    if confirm "[?] create new partitions with cfdisk (root, optional: boot and swap). [y/n]:"
+    if confirm "[?] create new partitions with cfdisk (root, optional: boot and swap). [y/n]:"; then
         # TODO: help
         cfdisk "${HD}"
 
-        printf "%s" "${NC}"
-
-        if [ "${?}" != "0" ]; then
+        [ "${?}" != "0" ] &&
             cri "error with cfdisk - run install again"
-        fi
     fi
+
+    printf "%s" "${NC}"
 
     return "${SUCCESS}"
 }
