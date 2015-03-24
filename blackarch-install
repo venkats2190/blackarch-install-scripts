@@ -119,6 +119,21 @@ cri()
 }
 
 
+# leet banner, very important
+banner()
+{
+    columns="$(tput cols)"
+    _str="--==[ blackarch-install ${VERSION} ]==--"
+    echo "${_str}"|while IFS= read -r line; do
+        printf "%s%*s\n%s" \
+            "${YELLOW}" $(( (${#line} + columns) / 2)) \
+            "$line" "${NC}"
+    done
+
+    return "${SUCCESS}"
+}
+
+
 # print banner + head
 header()
 {
@@ -143,21 +158,6 @@ MISC:
     -V: print version and exit
     -H: print help and exit
 EOF
-
-    return "${SUCCESS}"
-}
-
-
-# leet banner, very important
-banner()
-{
-    columns="$(tput cols)"
-    _str="--==[ blackarch-install ${VERSION} ]==--"
-    echo "${_str}"|while IFS= read -r line; do
-        printf "%s%*s\n%s" \
-            "${WHITE}" $(( (${#line} + columns) / 2)) \
-            "$line" "${NC}"
-    done
 
     return "${SUCCESS}"
 }
@@ -287,16 +287,16 @@ run_cfdisk()
     default_part="1"
     local a=0
 
-    printf "%s" "${WHITE}"
+    printf "%s\n" "${WHITE}"
 
     "${LUKS}" &&
         warn "You must create a non-encrypted BOOT partition (>=100MB)"
 
-    printf "[*] create new partitions with cfdisk (root, optional: boot and swap)\n"
+    printf "[*] create new partitions with cfdisk (root, optional: boot and swap). Loading...\n"
 
     # TODO: help
     #while [ "${a}" != 'y' ] || [
-    sleep 3
+    sleep 5
     cfdisk "${HD}"
 
     printf "%s" "${NC}"
@@ -334,7 +334,8 @@ get_partitions()
         ((default_part++))
     fi
 
-    "${LUKS}" && [ -z "${boot_part}" ] && cri "LUKS partition without BOOT partition wont boot"
+    # this wont be reached but just more checks
+    "${LUKS}" && [ -z "${boot_part}" ] && cri "LUKS partition without BOOT partition wont boot the system"
 
     a=""
 
@@ -445,6 +446,8 @@ ask_for_luks()
     else
 	    warn "root will NOT be encrypted"
     fi
+
+    printf "\n"
 
 }
 
