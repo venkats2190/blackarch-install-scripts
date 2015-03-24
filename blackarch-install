@@ -286,8 +286,7 @@ ask_cfdisk()
     default_part="1"
     local a=0
 
-    "${LUKS}" &&
-        warn "You must create a non-encrypted BOOT partition (>=100MB)"
+    "${LUKS}" && warn "You must create a non-encrypted BOOT partition (>=100MB)"
 
     printf "%s\n" "${WHITE}"
 
@@ -313,7 +312,7 @@ get_partitions()
     # * BOOT
     if "${LUKS}" || confirm "[?] created a BOOT partition [y/n]: "; then
         BOOT="true"
-        printf "%s[?] boot partition number [%s]: " "${WHITE}" "${default_part}"
+        printf "\n%s[?] boot partition number [%s]: " "${WHITE}" "${default_part}"
         read a
         if [ "${a}" != "" ]; then
             boot_part="${HD}${a}"
@@ -336,7 +335,7 @@ get_partitions()
     a=""
 
     # * SWAP
-    if confirm "[?] created a SWAP partition [y/n]: "; then
+    if confirm "\n[?] created a SWAP partition [y/n]: "; then
         SWAP="true"
         printf "\n [?] swap partition number [%s]:" "${default_part}"; read a
         if [ "${a}" != "" ]; then
@@ -387,8 +386,7 @@ format_partition()
     printf "%s[?] are you sure [y/n]: " "${WHITE}";
 
     # safety checks
-    [ "${BOOT}" == "true" ] &&
-        umount "${boot_part}" &> /dev/null
+    [ "${BOOT}" == "true" ] && umount "${boot_part}" &> /dev/null
     umount "${root_part}" &> /dev/null
 
     if confirm; then
