@@ -292,17 +292,15 @@ run_cfdisk()
     "${LUKS}" &&
         warn "You must create a non-encrypted BOOT partition (>=100MB)"
 
-    printf "[*] create new partitions with cfdisk (root, optional: boot and swap). Loading...\n"
+    if confirm "[?] create new partitions with cfdisk (root, optional: boot and swap). [y/n]:"
+        # TODO: help
+        cfdisk "${HD}"
 
-    # TODO: help
-    #while [ "${a}" != 'y' ] || [
-    sleep 5
-    cfdisk "${HD}"
+        printf "%s" "${NC}"
 
-    printf "%s" "${NC}"
-
-    if [ "${?}" != "0" ]; then
-        cri "error with cfdisk - run install again"
+        if [ "${?}" != "0" ]; then
+            cri "error with cfdisk - run install again"
+        fi
     fi
 
     return "${SUCCESS}"
@@ -340,7 +338,7 @@ get_partitions()
     a=""
 
     # * SWAP
-    if confirm "[?] created a SWAP partition [y/n]: " "${WHITE}"; then
+    if confirm "[?] created a SWAP partition [y/n]: "; then
         SWAP="true"
         printf "\n [?] swap partition number [%s]:" "${default_part}"; read a
         if [ "${a}" != "" ]; then
