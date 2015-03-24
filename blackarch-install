@@ -291,7 +291,7 @@ ask_cfdisk()
 
     printf "%s\n" "${WHITE}"
 
-    if confirm "[?] create new partitions with cfdisk (root, optional: boot and swap). [y/n]:"; then
+    if confirm "[?] create new partitions with cfdisk (root, optional: boot and swap). [y/n]: "; then
         # TODO: help
         cfdisk "${HD}"
 
@@ -372,24 +372,23 @@ get_partitions()
 # format partitions
 format_partition()
 {
+    header "hard drive configuration"
+
     warn "formatting partitions"
 
-    if [ "${BOOT}" == "true" ]; then
-        wprintf "%s   -> boot %s with type %s" "${WHITE}" "${boot_part}" "${boot_type}"
-    fi
+    "${BOOT}" && wprintf "%s   -> boot %s with type %s" \
+                         "${WHITE}" "${boot_part}" "${boot_type}"
 
-    if [ "${SWAP}" == "true" ]; then
-        wprintf "%s   -> swap %s with type swap" "${WHITE}" "${swap_part}"
-    fi
+    "${SWAP}" && wprintf "%s   -> swap %s with type swap" \
+                         "${WHITE}" "${swap_part}"
 
     wprintf "   -> / %s with type %s" "${root_part}" "${root_type}"
 
     printf "%s[?] are you sure [y/n]: " "${WHITE}";
-    # safety checks
-    if [ "${BOOT}" == "true" ]; then
-      umount "${boot_part}" &> /dev/null
-    fi
 
+    # safety checks
+    [ "${BOOT}" == "true" ] &&
+        umount "${boot_part}" &> /dev/null
     umount "${root_part}" &> /dev/null
 
     if confirm; then
