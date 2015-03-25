@@ -276,6 +276,8 @@ install_packages_repo()
 {
     header "Blackarch packages installation"
 
+    printf "%s" "${WHITE}"
+
     if confirm "[?] install Blackarch Tools now (grab coffee) [y/n]: "; then
         pacman -S blackarch
     fi
@@ -460,10 +462,9 @@ set_hostname()
 configure_ba_wm()
 {
     # configure lxdm
-    rm -rf /etc/lxdm /usr/share/lxdm /usr/share/xsessions
+    rm -rf /etc/lxdm /usr/share/lxdm
     mv /etc/lxdm-blackarch /etc/lxdm
     mv /usr/share/lxdm-blackarch /usr/share/lxdm
-    mv /usr/share/xsessions-blackarch /usr/share/xsessions
     systemctl enable lxdm
     # configure fluxbox
     rm -rf /usr/share/fluxbox
@@ -500,6 +501,7 @@ install()
     esac
 
     [ -z "${CHROOT_INSTALL}" ] && configure_vbox
+
     configure_users
 
     if [ -z "${CHROOT_INSTALL}" ]; then
