@@ -312,7 +312,7 @@ get_partitions()
     # * BOOT
     if "${LUKS}" || confirm "[?] created a BOOT partition [y/n]: "; then
         BOOT="true"
-        printf "\n%s[?] boot partition number [%s]: " "${WHITE}" "${default_part}"
+        printf "\n%s[?] BOOT partition number [%s]: " "${WHITE}" "${default_part}"
         read a
         if [ "${a}" != "" ]; then
             boot_part="${HD}${a}"
@@ -320,7 +320,7 @@ get_partitions()
             boot_part="${HD}${default_part}"
         fi
 
-        printf "[?] fs type of boot partition [ext2]: "
+        printf "[?] fs type of BOOT partition [ext2]: "
         read a
         if [ "${a}" != "" ]; then
             boot_type="${a}"
@@ -338,7 +338,7 @@ get_partitions()
     printf "\n"
     if confirm "[?] created a SWAP partition [y/n]: "; then
         SWAP="true"
-        printf "\n [?] swap partition number [%s]:" "${default_part}"; read a
+        printf "\n [?] SWAP partition number [%s]:" "${default_part}"; read a
         if [ "${a}" != "" ]; then
             swap_part="${HD}${a}"
         else
@@ -349,7 +349,7 @@ get_partitions()
     fi
 
     # * ROOT
-    printf "\n[?] root partition number [%s]: " "${default_part}"
+    printf "\n[?] ROOT partition number [%s]: " "${default_part}"
     read a
     if [ "${a}" != "" ]; then
         root_part="${HD}${a}"
@@ -357,7 +357,7 @@ get_partitions()
         root_part="${HD}${default_part}"
     fi
 
-    printf "[?] fs type of root partition [ext4]: "
+    printf "[?] fs type of ROOT partition [ext4]: "
     read a
     if [ "${a}" != "" ]; then
         root_type="${a}"
@@ -387,8 +387,8 @@ format_partition()
     printf "%s[?] are you sure [y/n]: " "${WHITE}";
 
     # safety checks
-    [ "${BOOT}" == "true" ] && umount "${boot_part}" &> /dev/null
-    umount "${root_part}" &> /dev/null
+    [ "${BOOT}" == "true" ] && umount -fl "${boot_part}" &> /dev/null
+    umount -fl "${root_part}" &> /dev/null
 
     if confirm; then
         # * BOOT
