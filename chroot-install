@@ -49,6 +49,7 @@ BLACKARCH_REPO_URL='http://www.blackarch.org/blackarch/$repo/os/$arch'
 # luks global variable
 LUKS="false"
 
+BLACKARCH_WM="false"
 
 # printf white
 wprintf()
@@ -188,13 +189,13 @@ select_ba_repo()
     # bugfix: detected chars added sometimes - clear chars
     _a=$(printf "%s" "${a}"|sed 's/[a-z]//Ig')
 
-    if [ "${_a}" -gt "$(wc -l < ${mirror_file})" ]; then
-        # BLACKARCH_REPO_URL gets the default one - choose better next time ;)
-        wprintf "[*] you fucked up man - we select BlackArch for you..."
-    else
+    if [ "${_a}" -le "$(wc -l < ${mirror_file})" ]; then
         BLACKARCH_REPO_URL=$(sed -n "${_a}p" "${mirror_file}"|cut -d"|" -f2)
         wprintf "   -> mirror from '%s' selected" \
             "$(sed -n "${_a}p" "${mirror_file}"|cut -d"|" -f3)"
+    else
+       # BLACKARCH_REPO_URL gets the default one - choose better next time ;)
+        wprintf "[*] you fucked up man - we select BlackArch for you..."
     fi
 
     # cleaning up
@@ -277,9 +278,11 @@ install_packages_repo()
     pacman -S blackarch
 
     header "Blackarch WM installation"
+    printf "%s" "${WHITE}"
     # X11 related, wms, configs
     if [ -z "${CHROOT_INSTALL}" ]; then
         if confirm "[?] install Blackarch WM (e.g. lxdm, fluxbox, dwm) [y/n]: "; then
+            BLACKARCH_WM=true
             # xorg
             pacman -S xorg-server xorg-xinit xorg-server-utils --noconfirm
             # xf86*
@@ -300,25 +303,10 @@ install_packages_repo()
             pacman -S blackarch-config-awesome blackarch-config-fluxbox \
             blackarch-config-lxdm blackarch-config-openbox fluxbox openbox awesome \
             spectrwm blackarch-dwm i3-wm wmii --noconfirm
-            # configure lxdm
-            rm -rf /etc/lxdm /usr/share/lxdm /usr/share/xsessions
-            mv /etc/lxdm-blackarch /etc/lxdm
-            mv /usr/share/lxdm-blackarch /usr/share/lxdm
-            mv /usr/share/xsessions-blackarch /usr/share/xsessions
-            systemctl enable lxdm
-            # configure fluxbox
-            rm -rf /usr/share/fluxbox
-            mv /usr/share/fluxbox-blackarch /usr/share/fluxbox
-            # configure openbox
-            rm -rf /etc/xdg/openbox
-            mv /etc/xdg/openbox-blackarch /etc/xdg/openbox
-            mv /usr/share/thems/blackarch/openbox-3-blackarch \
-               /usr/share/themes/blackarch/openbox-3
-            # configure awesome
-            rm -rf /etc/xdg/awesome/rc.lua
-            mv /etc/xdg/awesome/rc.lua.blackarch /etc/xdg/awesome/rc.lua
-        fi
+       fi
     fi
+
+    printf "%s" "${NC}"
 
     return "${SUCCESS}"
 }
@@ -328,6 +316,8 @@ install_packages_repo()
 install_grub()
 {
     header "grub installation"
+
+    printf "%s" "${WHITE}"
 
     if confirm "[?] install Grub [y/n]: "; then
         pacman -S grub --noconfirm --needed
@@ -347,6 +337,8 @@ install_grub()
         # update grub config
         grub-mkconfig -o /boot/grub/grub.cfg
     fi
+
+    print "%s" "${NC}"
 
     return "${SUCCESS}"
 }
@@ -461,6 +453,30 @@ set_hostname()
     return "${SUCCESS}"
 }
 
+configure_ba_wm()
+{
+    # configure lxdm
+    rm -rf /etc/lxdm /usr/share/lxdm /usr/share/xsessions
+    mv /etc/lxdm-blackarch /etc/lxdm
+    mv /usr/share/lxdm-blackarch /usr/share/lxdm
+    mv /usr/share/xsessions-blackarch /usr/share/xsessions
+    systemctl enable lxdm
+    # configure fluxbox
+    rm -rf /usr/share/fluxbox
+    mv /usr/share/fluxbox-blackarch /usr/share/fluxbox
+    # configure openbox
+    rm -rf /etc/xdg/openbox
+    mv /etc/xdg/openbox-blackarch /etc/xdg/openbox
+    mv /usr/share/thems/blackarch/openbox-3-blackarch \
+       /usr/share/themes/blackarch/openbox-3
+    # configure awesome
+    rm -rf /etc/xdg/awesome/rc.lua
+    mv /etc/xdg/awesome/rc.lua.blackarch /etc/xdg/awesome/rc.lua
+
+    return "${SUCCESS}"
+}
+
+
 # install the system
 install()
 {
@@ -492,6 +508,8 @@ install()
 
         install_grub
     fi
+
+    "${BLACKARCH_WM}" && configure_ba_wm
 
     # sync hd
     sync
