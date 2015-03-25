@@ -462,7 +462,7 @@ setup_filesystem()
         fi
     done
 
-    printf "[*] hard drive selected: %s\n" "${HD}"
+    printf "[*] hard drive selected: %s\n\n" "${HD}"
 
     printf "%s" "${NC}"
 

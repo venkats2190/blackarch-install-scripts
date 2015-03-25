@@ -342,7 +342,7 @@ install_grub()
         grub-mkconfig -o /boot/grub/grub.cfg
     fi
 
-    print "%s" "${NC}"
+    printf "%s" "${NC}"
 
     return "${SUCCESS}"
 }
@@ -471,7 +471,7 @@ configure_ba_wm()
     # configure openbox
     rm -rf /etc/xdg/openbox
     mv /etc/xdg/openbox-blackarch /etc/xdg/openbox
-    mv /usr/share/thems/blackarch/openbox-3-blackarch \
+    mv /usr/share/themes/blackarch/openbox-3-blackarch \
        /usr/share/themes/blackarch/openbox-3
     # configure awesome
     rm -rf /etc/xdg/awesome/rc.lua
