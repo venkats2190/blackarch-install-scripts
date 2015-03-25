@@ -276,7 +276,7 @@ install_packages_repo()
 {
     header "Blackarch packages installation"
 
-    if confirm "[?] install Blackarch Tools [y/n]: "; then
+    if confirm "[?] install Blackarch Tools now (grab coffee) [y/n]: "; then
         pacman -S blackarch
     fi
 
