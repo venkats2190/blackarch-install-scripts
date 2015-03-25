@@ -126,7 +126,7 @@ banner()
     _str="--==[ blackarch-install ${VERSION} ]==--"
     echo "${_str}"|while IFS= read -r line; do
         printf "%s%*s\n%s" \
-            "${YELLOW}" $(( (${#line} + columns) / 2)) \
+            "${WHITE}" $(( (${#line} + columns) / 2)) \
             "$line" "${NC}"
     done
 
@@ -175,10 +175,11 @@ check_env()
 # update the system
 update_system()
 {
-    header "system update"
+    header "System update"
 
     if [ "`uname -m`" = "x86_64" ]; then
-        wprintf "[*] enabling multilib in /etc/pacman.conf"
+        wprintf "[+] enabling multilib in /etc/pacman.conf"
+        echo
         if grep -q "#\[multilib\]" /etc/pacman.conf
         then
             # it exist but commented
@@ -199,7 +200,7 @@ update_system()
 
 configure_hard_drive()
 {
-    header "hard drive configuration"
+    header "Hard drive configuration"
 
     ask_for_luks
     setup_filesystem
@@ -215,17 +216,18 @@ configure_hard_drive()
 # set keymaps
 set_keymaps()
 {
-    header "keymap configuration"
+    header "Keymap configuration"
 
     printf "%s" "${WHITE}"
 
-    #printf "[*] running locale-gen, please wait...\n"
+    #printf "[+] running locale-gen, please wait...\n"
     #locale-gen &> /dev/null
 
     while true; do
-        printf "[*] keymap options:\n"
+        printf "[+] Keymap options:\n"
         printf "    1. set a keymap\n"
         printf "    2. list available keymaps\n"
+        echo
         printf "[?] select option: "
 
         read keymaps_opt
@@ -372,7 +374,7 @@ get_partitions()
 # format partitions
 format_partition()
 {
-    header "hard drive configuration"
+    header "Hard drive configuration"
 
     warn "formatting partitions"
 
@@ -384,6 +386,7 @@ format_partition()
 
     wprintf "   -> / %s with type %s" "${root_part}" "${root_type}"
 
+    echo
     printf "%s[?] are you sure [y/n]: " "${WHITE}";
 
     # safety checks
@@ -400,17 +403,18 @@ format_partition()
         # * ROOT
         if [ "${LUKS}" = "true" ]; then
             # format and encrypt root partition
-            printf "[*] formatting root partiton"
+            printf "[+] formatting root partiton"
             cryptsetup -y -v luksFormat "${root_part}"
-            printf "\n[*] opening encrypted partition\n"
+            printf "\n[+] opening encrypted partition\n"
+            echo
             cryptsetup open "${root_part}" cryptroot
             "mkfs.${root_type}" -L root "/dev/mapper/cryptroot"
             check_mkfs_status
-            printf "[*] created encrypted root partition:"
+            printf "[+] created encrypted root partition:"
             printf "    -> /dev/mapper/cryptroot - ext4\n"
         else
             "mkfs.${root_type}" -L root "${root_part}"; check_mkfs_status
-            printf "[*] created root partition:"
+            printf "[+] created root partition:"
             printf "    -> %s - ext4\n" "${root_part}"
         fi
 
@@ -436,8 +440,10 @@ ask_for_luks()
 
     if confirm "[?] full encrypted root [y/n]: "; then
         LUKS="true"
+        echo
 	    warn "root will be encrypted"
     else
+        echo
 	    warn "root will NOT be encrypted"
     fi
 
@@ -462,7 +468,7 @@ setup_filesystem()
         fi
     done
 
-    printf "[*] hard drive selected: %s\n\n" "${HD}"
+    printf "[+] hard drive selected: %s\n\n" "${HD}"
 
     printf "%s" "${NC}"
 
@@ -499,9 +505,10 @@ mount_filesystem()
 # install ArchLinux base packages
 install_base_packages()
 {
-    header "base system installation"
+    header "Base system installation"
 
-    wprintf "[*] installing ArchLinux base packages"
+    wprintf "[+] installing ArchLinux base packages"
+    echo
 
     pacstrap -c "${ROOT}" base
 
@@ -625,7 +632,7 @@ install_chroot_mode()
     header "Decompressing Archlinux..."
     tar -zxvf "$(find * -maxdepth 0 -name archlinux*tar.gz)" &> /dev/null
     mv "root.$(uname -m)" "${ROOT}"
-    wprintf "[*] Setting up Archlinux..."
+    wprintf "[+] Setting up Archlinux..."
     # random server
     printf 'Server = http://mirror.nl.leaseweb.net/archlinux/$repo/os/$arch' \
             >> "${ROOT}/etc/pacman.d/mirrorlist"
@@ -637,7 +644,7 @@ install_chroot_mode()
 
 help_menu_how()
 {
-    header "Welcome to BlackArch Linux Installation"
+    header "Welcome to the BlackArch Linux Installation"
 
     wprintf "1. Install from official repository of BlackArch"
     wprintf "   - Install Arch Linux from the official Arch repositories"
@@ -646,7 +653,7 @@ help_menu_how()
     wprintf "   - Install Arch Linux from the official Arch"
     wprintf "     repositories and compile the BlackArch tools"
     wprintf "     from source."
-    wprintf "Press any key to continue...."; read _tmp
+    wprintf "Press any key to continue ..."; read _tmp
 
     return "${SUCCESS}"
 }
@@ -660,9 +667,10 @@ install_menu_how()
 
         printf "%s" "${WHITE}"
 
-        printf "[*] Installation modes:\n"
+        printf "[+] Installation modes:\n"
         printf "    1. Install from package repository\n"
         printf "    2. Install from sources using blackman\n"
+        echo
         printf "Make a choice [h - help]: "; read menu_opt_how
 
         [ "${menu_opt_how}" == "h" ] && help_menu_how
@@ -695,15 +703,17 @@ install_menu_where()
         header "Welcome to BlackArch Linux Installation"
         printf "%s" "${WHITE}"
 
-        printf "[*] Where to install BlackArch:\n"
-        printf "    1. Install to Drive\n"
+        printf "[+] Install location:\n"
+        printf "    1. Install to Hard Drive\n"
         printf "    2. Install to directory\n"
+        echo
         printf "Make a choice [h - help]: "; read menu_opt_where
 
         [ "${menu_opt_where}" == "h" ] && help_menu_where
     done
 
     if [ "${menu_opt_where}" == "${MENU_CHROOT}" ]; then
+        echo
         printf "[?] Directory to make chroot [%s]: " "${ROOT}"
         read a; [ "${a}" != "" ] && ROOT="${a}"
     fi

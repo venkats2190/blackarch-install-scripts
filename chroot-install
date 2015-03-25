@@ -164,7 +164,7 @@ select_ba_repo()
     mirror_file="/tmp/mirror.lst"
     github_url="https://github.com/BlackArch/blackarch/raw/master/mirror/mirror.lst"
 
-    wprintf "[*] fetching mirror list"
+    wprintf "[+] fetching mirror list"
     # check basic software needed
     command -v wget >/dev/null 2>&1 ||
         pacman -S wget --noconfirm &>/dev/null
@@ -195,7 +195,7 @@ select_ba_repo()
             "$(sed -n "${_a}p" "${mirror_file}"|cut -d"|" -f3)"
     else
        # BLACKARCH_REPO_URL gets the default one - choose better next time ;)
-        wprintf "[*] you fucked up man - we select BlackArch for you..."
+        wprintf "[+] you fucked up man - we select BlackArch for you..."
     fi
 
     # cleaning up
@@ -208,7 +208,7 @@ select_ba_repo()
 # update the system
 update_system()
 {
-    header "adding BlackArch repository"
+    header "Adding BlackArch Linux repository"
 
     select_ba_repo
     if [ "${?}" = "${FAILURE}" ]; then
@@ -274,7 +274,7 @@ install_packages_blackman()
 # install blackarch packages
 install_packages_repo()
 {
-    header "Blackarch packages installation"
+    header "BlackArch Linux packages installation"
 
     printf "%s" "${WHITE}"
 
@@ -282,12 +282,12 @@ install_packages_repo()
         pacman -S blackarch
     fi
 
-    header "Blackarch WM installation"
+    header "BlackArch Linux WM installation"
 
     printf "%s" "${WHITE}"
     # X11 related, wms, configs
     if [ -z "${CHROOT_INSTALL}" ]; then
-        if confirm "[?] install Blackarch WM (e.g. lxdm, fluxbox, dwm) [y/n]: "; then
+        if confirm "[?] install BlackArch Linux WM (e.g. lxdm, fluxbox, dwm) [y/n]: "; then
             BLACKARCH_WM=true
             # xorg
             pacman -S xorg-server xorg-xinit xorg-server-utils --noconfirm
@@ -322,7 +322,7 @@ install_packages_repo()
 # install grub bootloader
 install_grub()
 {
-    header "grub installation"
+    header "Grub installation"
 
     printf "%s" "${WHITE}"
 
@@ -372,7 +372,7 @@ set_passwd()
 
 configure_vbox()
 {
-    header "virtualbox configuration"
+    header "Virtualbox configuration"
 
     printf "%s" "${WHITE}"
 
@@ -394,21 +394,23 @@ configure_vbox()
 # add and configure users
 configure_users()
 {
-    header "user configuration"
+    header "User configuration"
 
     printf "%s" "${WHITE}"
 
-    printf "[*] setting up root password\n"
+    printf "[+] setting up root password\n"
+    echo
     set_passwd
 
     mv /tmp/shell/root/.bashrc /root/
     cp /root/.bashrc /root/.bash_profile
 
+    echo
     if confirm "[?] setup a normal user account [y/n]: "; then
         printf "[?] user name: "; read user
         useradd -m -p "" -g users \
             -G "adm,audio,floppy,log,network,rfkill,scanner,storage,optical,power,wheel" \
-            -s /bin/bash "${user}" && printf "[*] user '%s' created\n" "${user}"
+            -s /bin/bash "${user}" && printf "[+] user '%s' created\n" "${user}"
         set_passwd "${user}"
         mv /tmp/shell/user/.bashrc "/home/${user}/"
         cp "/home/${user}/.bashrc" "/home/${user}/.bash_profile"
@@ -427,7 +429,7 @@ configure_users()
 # not used atm
 generate_initramfs()
 {
-    header "initramfs"
+    header "Creating the initramfs"
 
     sed -i 's/block filesystems/block encrypt filesystems/' /etc/mkinitcpio.conf
 
@@ -440,7 +442,7 @@ generate_initramfs()
 # set system hostname
 set_hostname()
 {
-    header "hostname setup"
+    header "Hostname setup"
 
     printf "%s" "${WHITE}"
 
@@ -495,11 +497,11 @@ install()
 {
     menu_opt=${1}
 
-    header "package installation"
+    header "Package installation"
 
     case "${menu_opt}" in
         "repository")
-            header "system update"
+            header "System update"
             update_system
             install_packages_repo
             ;;
@@ -528,8 +530,8 @@ install()
     # sync hd
     sync
 
-    header "Blackarch Installed Successfully!"
-    printf "\n%s[*] BlackArch Linux ready! Enjoy!%s\n\n\n" "${RED}" "${NC}"
+    header "Installation successfull!"
+    printf "\n%s[+] Your BlackArch Linux is ready, enjoy!%s\n\n\n" "${RED}" "${NC}"
 
     return "${SUCCESS}"
 }
