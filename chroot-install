@@ -275,9 +275,13 @@ install_packages_blackman()
 install_packages_repo()
 {
     header "Blackarch packages installation"
-    pacman -S blackarch
+
+    if confirm "[?] install Blackarch Tools [y/n]: "; then
+        pacman -S blackarch
+    fi
 
     header "Blackarch WM installation"
+
     printf "%s" "${WHITE}"
     # X11 related, wms, configs
     if [ -z "${CHROOT_INSTALL}" ]; then
