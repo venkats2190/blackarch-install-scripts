@@ -429,7 +429,7 @@ configure_users()
 # not used atm
 generate_initramfs()
 {
-    header "Creating the initramfs"
+    header "Creating initramfs"
 
     sed -i 's/block filesystems/block encrypt filesystems/' /etc/mkinitcpio.conf
 
