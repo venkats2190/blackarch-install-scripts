@@ -327,8 +327,6 @@ install_grub()
 
     if confirm "[?] install Grub [y/n]: "; then
         pacman -S grub --noconfirm --needed
-        grub-install --target=i386-pc "${HD}"
-        grub-mkconfig -o /boot/grub/grub.cfg
 
         mv /tmp/splash.png /boot/grub/
         printf 'GRUB_BACKGROUND="/boot/grub/splash.png"\n' >> /etc/default/grub
@@ -340,8 +338,10 @@ install_grub()
             #sed -i "s|rw  quiet|rw cryptdevice=${ROOT_PART}:cryptroot|" \
             #  /boot/grub/grub.cfg
         fi
-        # update grub config
+        # install/update grub config
+        grub-install --target=i386-pc "${HD}"
         grub-mkconfig -o /boot/grub/grub.cfg
+
     fi
 
     printf "%s" "${NC}"
