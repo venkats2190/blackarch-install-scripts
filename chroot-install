@@ -308,8 +308,8 @@ install_packages_repo()
             # blackarch WM
             pacman -S blackarch-config-awesome blackarch-config-fluxbox \
             blackarch-config-lxdm blackarch-config-openbox \
-            blackarch-config-spectrwm fluxbox openbox awesome spectrwm \
-            blackarch-dwm i3-wm wmii --noconfirm
+            blackarch-config-wmii blackarch-config-spectrwm fluxbox openbox \
+            awesome spectrwm blackarch-dwm i3-wm wmii --noconfirm
        fi
     fi
 
