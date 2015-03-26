@@ -307,8 +307,9 @@ install_packages_repo()
             pacman -S xterm --noconfirm
             # blackarch WM
             pacman -S blackarch-config-awesome blackarch-config-fluxbox \
-            blackarch-config-lxdm blackarch-config-openbox fluxbox openbox awesome \
-            spectrwm blackarch-dwm i3-wm wmii --noconfirm
+            blackarch-config-lxdm blackarch-config-openbox \
+            blackarch-config-spectrwm fluxbox openbox awesome spectrwm \
+            blackarch-dwm i3-wm wmii --noconfirm
        fi
     fi
 
@@ -479,6 +480,11 @@ configure_ba_wm()
     # configure awesome
     rm -rf /etc/xdg/awesome/rc.lua
     mv /etc/xdg/awesome/rc.lua.blackarch /etc/xdg/awesome/rc.lua
+
+    # configure spectrwm
+    rm -rf /etc/spectrwm.conf
+    cp /usr/share/spectrwm-blackarch/spectrwm.conf /etc/spectrwm.conf
+    mv /usr/share/spectrwm-blackarch/spectrwm.conf /root/.spectrwm.conf
 
     return "${SUCCESS}"
 }
