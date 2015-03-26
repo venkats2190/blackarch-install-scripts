@@ -330,8 +330,6 @@ install_grub()
 
         mv /tmp/splash.png /boot/grub/
         printf 'GRUB_BACKGROUND="/boot/grub/splash.png"\n' >> /etc/default/grub
-        sed -i 's/Arch Linux/BlackArch Linux/' /boot/grub/grub.cfg
-
         if [ "${LUKS}" == "true" ]; then
             sed -i "s|quiet|cryptdevice=${ROOT_PART}:cryptroot root=/dev/mapper/cryptroot|" /etc/default/grub
             sed -i 's|"Arch"|"BlackArch"|' /etc/default/grub
@@ -339,9 +337,9 @@ install_grub()
             #  /boot/grub/grub.cfg
         fi
         # install/update grub config
-        grub-install --target=i386-pc "${HD}"
         grub-mkconfig -o /boot/grub/grub.cfg
-
+        grub-install --target=i386-pc "${HD}"
+        sed -i 's/Arch Linux/BlackArch Linux/' /boot/grub/grub.cfg
     fi
 
     printf "%s" "${NC}"
