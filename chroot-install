@@ -37,10 +37,14 @@ VERBOSE="/dev/null"
 VERSION="v0.8 - testing"
 
 # colors
-WHITE="$(tput bold ; tput setaf 7)"
+WHITE="$(tput setaf 7)"
+WHITEB="$(tput bold ; tput setaf 7)"
 GREEN="$(tput setaf 2)"
-RED="$(tput bold; tput setaf 1)"
+GREENB="$(tput bold ; tput setaf 2)"
+RED="$(tput setaf 1)"
+REDB="$(tput bold; tput setaf 1)"
 YELLOW="$(tput bold ; tput setaf 3)"
+YELLOWB="$(tput bold ; tput setaf 3)"
 NC="$(tput sgr0)" # No Color
 
 # BA REPO DEFAULT
@@ -50,6 +54,7 @@ BLACKARCH_REPO_URL='http://www.blackarch.org/blackarch/$repo/os/$arch'
 LUKS="false"
 
 BLACKARCH_WM="false"
+
 
 # printf white
 wprintf()
@@ -69,7 +74,7 @@ warn()
     fmt="${1}"
 
     shift
-    printf "%s[!] WARNING: ${fmt}%s\n" "${RED}" "${@}" "${NC}"
+    printf "%s[!] WARNING: ${fmt}%s\n" "${YELLOW}" "${@}" "${NC}"
 
     return "${SUCCESS}"
 }
@@ -92,7 +97,7 @@ cri()
 {
     fmt=${1}
     shift
-    printf "%s[-] CRITICAL: ${fmt}%s\n" "${RED}" "${@}" "${NC}"
+    printf "%s[-] CRITICAL: ${fmt}%s\n" "${REDB}" "${@}" "${NC}"
 
     exit "${FAILURE}"
 }
@@ -300,7 +305,8 @@ install_packages_repo()
             xf86-video-s3 xf86-video-s3virge xf86-video-savage xf86-video-siliconmotion \
             xf86-video-sis xf86-video-sisimedia xf86-video-sisusb xf86-input-synaptics \
             xf86-video-tdfx xf86-video-trident xf86-video-tseng xf86-video-v4l \
-            xf86-video-vesa xf86-video-vmware xf86-video-voodoo xf86-input-synaptics --noconfirm
+            xf86-video-vesa xf86-video-vmware xf86-video-voodoo \
+            xf86-input-synaptics --noconfirm
             # install lxdm
             pacman -S lxdm --noconfirm --force
             # term
@@ -309,7 +315,8 @@ install_packages_repo()
             pacman -S blackarch-config-awesome blackarch-config-fluxbox \
             blackarch-config-lxdm blackarch-config-openbox \
             blackarch-config-wmii blackarch-config-spectrwm fluxbox openbox \
-            awesome spectrwm blackarch-dwm i3-wm wmii --noconfirm --force
+            awesome spectrwm blackarch-dwm i3-wm wmii blackarch-config-gtk \
+            --noconfirm --force
        fi
     fi
 
@@ -467,6 +474,7 @@ configure_ba_wm()
     mv /etc/lxdm-blackarch /etc/lxdm
     mv /usr/share/lxdm-blackarch /usr/share/lxdm
     mv /usr/share/xsessions-blackarch /usr/share/xsessions
+    mv /usr/share/gtk-blackarch /usr/share/gtk-2.0
     systemctl enable lxdm
 
     # configure fluxbox

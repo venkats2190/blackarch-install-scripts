@@ -64,10 +64,14 @@ FAILURE=31337
 VERBOSE="/dev/null"
 
 # colors
-WHITE="$(tput bold ; tput setaf 7)"
+WHITE="$(tput setaf 7)"
+WHITEB="$(tput bold ; tput setaf 7)"
 GREEN="$(tput setaf 2)"
-RED="$(tput bold; tput setaf 1)"
+GREENB="$(tput bold ; tput setaf 2)"
+RED="$(tput setaf 1)"
+REDB="$(tput bold; tput setaf 1)"
 YELLOW="$(tput bold ; tput setaf 3)"
+YELLOWB="$(tput bold ; tput setaf 3)"
 NC="$(tput sgr0)" # No Color
 
 
@@ -89,7 +93,7 @@ warn()
     fmt="${1}"
 
     shift
-    printf "%s[!] WARNING: ${fmt}%s\n" "${RED}" "${@}" "${NC}"
+    printf "%s[!] WARNING: ${fmt}%s\n" "${YELLOW}" "${@}" "${NC}"
 
     return "${SUCCESS}"
 }
@@ -113,7 +117,7 @@ cri()
     fmt="${1}"
 
     shift
-    printf "%s[x] CRITICAL: ${fmt}%s\n" "${RED}" "${@}" "${NC}"
+    printf "%s[x] CRITICAL: ${fmt}%s\n" "${REDB}" "${@}" "${NC}"
 
     exit "${FAILURE}"
 }
@@ -404,6 +408,7 @@ format_partition()
         if [ "${LUKS}" = "true" ]; then
             # format and encrypt root partition
             printf "[+] formatting root partiton"
+            echo
             cryptsetup -y -v luksFormat "${root_part}"
             printf "\n[+] opening encrypted partition\n"
             echo
