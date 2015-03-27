@@ -53,7 +53,7 @@ LUKS="false"
 # swap global var
 SWAP="false"
 
-# swap global var
+# boot global var
 BOOT="false"
 
 # blackarch-install version
