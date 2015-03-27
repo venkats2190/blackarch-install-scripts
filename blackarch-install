@@ -53,6 +53,9 @@ LUKS="false"
 # swap global var
 SWAP="false"
 
+# boot global var
+BOOT="false"
+
 # blackarch-install version
 VERSION="v0.8 - testing"
 
@@ -396,6 +399,8 @@ format_partition()
     # safety checks
     [ "${BOOT}" == "true" ] && umount -fl "${boot_part}" &> /dev/null
     umount -fl "${root_part}" &> /dev/null
+    umount -fl "${ROOT}" &> /dev/null
+    cryptsetup luksClose cryptroot &> /dev/null
 
     if confirm; then
         # * BOOT
