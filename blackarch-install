@@ -395,6 +395,8 @@ format_partition()
     # safety checks
     [ "${BOOT}" == "true" ] && umount -fl "${boot_part}" &> /dev/null
     umount -fl "${root_part}" &> /dev/null
+    umount -fl "${ROOT}" &> /dev/null
+    cryptsetup luksClose cryptroot &> /dev/null
 
     if confirm; then
         # * BOOT
