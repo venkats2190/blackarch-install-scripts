@@ -53,6 +53,9 @@ LUKS="false"
 # swap global var
 SWAP="false"
 
+# swap global var
+BOOT="false"
+
 # blackarch-install version
 VERSION="v0.8 - testing"
 
