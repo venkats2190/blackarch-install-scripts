@@ -307,7 +307,7 @@ install_packages_repo()
             xf86-video-tdfx xf86-video-trident xf86-video-tseng xf86-video-v4l \
             xf86-video-vesa xf86-video-vmware xf86-video-voodoo \
             xf86-input-synaptics xorg-font-utils xorg-fonts-alias \
-            xorg-font-misc xorg-mkfontscale xorg-mkfontdir ttf-indic-otf \
+            xorg-fonts-misc xorg-mkfontscale xorg-mkfontdir ttf-indic-otf \
             --noconfirm
             # install lxdm
             pacman -S lxdm --noconfirm --force
