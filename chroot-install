@@ -292,7 +292,7 @@ install_packages_repo()
     printf "%s" "${WHITE}"
     # X11 related, wms, configs
     if [ -z "${CHROOT_INSTALL}" ]; then
-        if confirm "[?] install BlackArch Linux WM (lxdm + [fluxbox, awesome, etc.]) [y/n]: "; then
+        if confirm "[?] Install BlackArch Linux WMs (lxdm + [fluxbox, awesome, etc.]) [y/n]: "; then
             BLACKARCH_WM=true
             # xorg
             pacman -S xorg-server xorg-xinit xorg-server-utils --noconfirm
