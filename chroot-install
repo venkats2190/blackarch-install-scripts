@@ -283,7 +283,7 @@ install_packages_repo()
 
     printf "%s" "${WHITE}"
 
-    if confirm "[?] install Blackarch Tools now (grab coffee) [y/n]: "; then
+    if confirm "[?] install BlackArch Linux Tools now (grab a coffee) [y/n]: "; then
         pacman -S blackarch
     fi
 
