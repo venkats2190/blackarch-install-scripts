@@ -220,6 +220,23 @@ update_system()
         warn "mirror selection failed - we go with default one"
     fi
 
+    sed -i 's|#Color|Color|' /etc/pacman.conf
+
+    if [ "`uname -m`" = "x86_64" ]; then
+        wprintf "[+] enabling multilib in /etc/pacman.conf"
+        echo
+        if grep -q "#\[multilib\]" /etc/pacman.conf
+        then
+            # it exist but commented
+            sed -i '/\[multilib\]/{ s/^#//; n; s/^#//; }' /etc/pacman.conf
+        elif ! grep -q "\[multilib\]" /etc/pacman.conf
+        then
+            # it does not exist at all
+            printf "[multilib]\nInclude = /etc/pacman.d/mirrorlist\n" \
+                >> /etc/pacman.conf
+        fi
+    fi
+
     if ! grep -q "blackarch" /etc/pacman.conf; then
         printf '[blackarch]\nServer = %s\n' "${BLACKARCH_REPO_URL}" \
             >> /etc/pacman.conf
