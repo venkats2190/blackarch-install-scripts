@@ -45,7 +45,7 @@ boot_type="ext2"
 boot_size="500MB"
 swap_size="1024MB"
 root_type="ext4"
-root_size="10GB"
+root_size="20GB"
 
 # luks global var
 LUKS="false"
