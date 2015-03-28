@@ -133,7 +133,7 @@ banner()
     _str="--==[ blackarch-install ${VERSION} ]==--"
     echo "${_str}"|while IFS= read -r line; do
         printf "%s%*s\n%s" \
-            "${WHITE}" $(( (${#line} + columns) / 2)) \
+            "${WHITEB}" $(( (${#line} + columns) / 2)) \
             "$line" "${NC}"
     done
 
