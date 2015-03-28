@@ -793,7 +793,7 @@ main()
     return "${SUCCESS}"
 }
 
-[ "$(id -u)" != "0" ] && cri "Blackarch install must be run as root"
+[ "$(id -u)" != "0" ] && cri "You must be root to run the BlackArch installer!"
 
 # program start
 main "${@}"
