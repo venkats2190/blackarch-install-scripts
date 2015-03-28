@@ -124,9 +124,9 @@ header()
     head="${@}"
 
     clear
-    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+    printf "${REDB}%*s${NC}\n" "${COLUMNS:-$(tput cols)}" | tr ' ' '-'
     banner
-    printf '%*s\n\n\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+    printf "${REDB}%*s${NC}\n\n\n" "${COLUMNS:-$(tput cols)}" | tr ' ' '-'
     wprintf ">> %s\n\n" "${head}"
 
     return "${SUCCESS}"
@@ -292,7 +292,7 @@ install_packages_repo()
     printf "%s" "${WHITE}"
     # X11 related, wms, configs
     if [ -z "${CHROOT_INSTALL}" ]; then
-        if confirm "[?] install BlackArch Linux WM (e.g. lxdm, fluxbox, dwm) [y/n]: "; then
+        if confirm "[?] install BlackArch Linux WM (lxdm + [fluxbox, awesome, etc.]) [y/n]: "; then
             BLACKARCH_WM=true
             # xorg
             pacman -S xorg-server xorg-xinit xorg-server-utils --noconfirm
@@ -386,6 +386,7 @@ configure_vbox()
     printf "%s" "${WHITE}"
 
     if confirm "[?] Install VirtualBox packages [y/n]: "; then
+        echo
         pacman -S virtualbox-guest-utils \
                   virtualbox-guest-modules  --noconfirm
         printf "vboxguest\nvboxsf\nvboxvideo" \

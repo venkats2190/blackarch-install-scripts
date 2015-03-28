@@ -147,9 +147,9 @@ header()
     head="${@}"
 
     clear
-    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+    printf "${REDB}%*s${NC}\n" "${COLUMNS:-$(tput cols)}" | tr ' ' '-'
     banner
-    printf '%*s\n\n\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+    printf "${REDB}%*s${NC}\n\n\n" "${COLUMNS:-$(tput cols)}" | tr ' ' '-'
     wprintf ">> %s\n\n" "${head}"
 
     return "${SUCCESS}"
