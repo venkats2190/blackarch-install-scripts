@@ -479,6 +479,8 @@ configure_ba_wm()
     mv /usr/share/xsessions-blackarch /usr/share/xsessions
     rm -rf /usr/share/gtk-2.0
     mv /usr/share/gtk-blackarch /usr/share/gtk-2.0
+    rm -rf /usr/share/xsessions/openbox-kde.desktop
+    rm -rf /usr/share/xsessions/i3-with-shmlog.desktop
     systemctl enable lxdm
 
     # configure fluxbox
