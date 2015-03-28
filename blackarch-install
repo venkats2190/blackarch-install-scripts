@@ -316,7 +316,7 @@ ask_cfdisk()
 # get selected partitions
 get_partitions()
 {
-    printf "%s" "${WHITE}"
+    printf "%s\n" "${WHITE}"
 
     # * BOOT
     if "${LUKS}" || confirm "[?] created a BOOT partition [y/n]: "; then
@@ -477,7 +477,7 @@ setup_filesystem()
         fi
     done
 
-    printf "[+] hard drive selected: %s\n\n" "${HD}"
+    printf "\n[+] hard drive selected: %s\n" "${HD}"
 
     printf "%s" "${NC}"
 
