@@ -127,7 +127,7 @@ header()
     printf "${REDB}%*s${NC}\n" "${COLUMNS:-$(tput cols)}" | tr ' ' '-'
     banner
     printf "${REDB}%*s${NC}\n\n\n" "${COLUMNS:-$(tput cols)}" | tr ' ' '-'
-    wprintf ">> %s\n\n" "${head}"
+    printf "${GREEN}>> %s${NC}\n\n" "${head}"
 
     return "${SUCCESS}"
 }
