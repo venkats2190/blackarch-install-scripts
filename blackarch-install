@@ -654,7 +654,7 @@ install_chroot_mode()
 
 help_menu_how()
 {
-    header "Welcome to the BlackArch Linux Installation"
+    header "Welcome to the BlackArch Linux installation!"
 
     wprintf "1. Install from official repository of BlackArch"
     wprintf "   - Install Arch Linux from the official Arch repositories"
@@ -673,7 +673,7 @@ install_menu_how()
 {
     while ! [ "${menu_opt_how}" = "${MENU_REPO}" -o \
               "${menu_opt_how}" = "${MENU_BLACKMAN}" ]; do
-        header "Welcome to BlackArch Linux Installation"
+        header "Welcome to BlackArch Linux installation!"
 
         printf "%s" "${WHITE}"
 
