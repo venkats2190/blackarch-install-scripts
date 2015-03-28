@@ -344,7 +344,6 @@ get_partitions()
     a=""
 
     # * SWAP
-    printf "\n"
     if confirm "[?] created a SWAP partition [y/n]: "; then
         SWAP="true"
         printf "\n [?] SWAP partition number [%s]:" "${default_part}"; read a
@@ -358,7 +357,7 @@ get_partitions()
     fi
 
     # * ROOT
-    printf "\n[?] ROOT partition number [%s]: " "${default_part}"
+    printf "[?] ROOT partition number [%s]: " "${default_part}"
     read a
     if [ "${a}" != "" ]; then
         root_part="${HD}${a}"
@@ -659,10 +658,12 @@ help_menu_how()
     wprintf "1. Install from official repository of BlackArch"
     wprintf "   - Install Arch Linux from the official Arch repositories"
     wprintf "     and install tools from the BlackArch package repository."
+    echo
     wprintf "2. Install from sources using blackman"
     wprintf "   - Install Arch Linux from the official Arch"
     wprintf "     repositories and compile the BlackArch tools"
     wprintf "     from source."
+    echo
     wprintf "Press any key to continue ..."; read _tmp
 
     return "${SUCCESS}"
@@ -697,10 +698,12 @@ help_menu_where()
 
     wprintf "1. Install to Drive"
     wprintf "   - Internal or external drive (e.g. /dev/sda)"
+    echo
     wprintf "2. Install to directory"
     wprintf "   - Installs BlackArch for use with chroot."
     wprintf "     This allows you use BlackArch with other"
     wprintf "     distros (e.g. Debian, Ubuntu, Gentoo)"
+    echo
     wprintf "Press any key to continue...."; read _tmp
 
     return
