@@ -246,7 +246,16 @@ update_system()
 
     # keep white style with strap.sh
     printf "%s" "${WHITE}"
-    curl -s http://blackarch.org/strap.sh | bash
+    command -v wget >/dev/null 2>&1 ||
+        pacman -S wget --noconfirm &>/dev/null
+    wget -O /tmp/strap.sh http://blackarch.org/strap.sh
+    sha1strap=$(sha1sum /tmp/strap.sh)
+    if [ "${sha1strap}" == "f8456229463718c097cf70ed06a806f981be7423" ]; then
+        bash /tmp/strap.sh
+    else
+        warn "wrong sha1sum for strap.sh: ${sha1strap}"
+        cri "Aborting"
+    fi
     printf "%s" "${NC}"
 
     #debug - under dev
