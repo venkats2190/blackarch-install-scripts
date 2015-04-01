@@ -256,6 +256,10 @@ update_system()
         warn "wrong sha1sum for strap.sh: ${sha1strap}"
         cri "Aborting"
     fi
+
+    #clean up
+    rm -rf /tmp/strap.sh
+
     printf "%s" "${NC}"
 
     #debug - under dev
