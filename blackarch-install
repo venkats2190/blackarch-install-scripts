@@ -57,7 +57,7 @@ SWAP="false"
 BOOT="false"
 
 # blackarch-install version
-VERSION="v0.8"
+VERSION="v0.8.1"
 
 # return codes
 SUCCESS=1337
