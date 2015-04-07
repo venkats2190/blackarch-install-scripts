@@ -445,8 +445,8 @@ configure_users()
     echo
     set_passwd
 
-    mv /tmp/shell/root/.bashrc /root/
-    cp /root/.bashrc /root/.bash_profile
+    mv /tmp/shell/root/.bash* /root/
+    mv /tmp/shell/root/.Xresources /root/
 
     echo
     if confirm "[?] setup a normal user account [y/n]: "; then
@@ -455,8 +455,8 @@ configure_users()
             -G "adm,audio,floppy,log,network,rfkill,scanner,storage,optical,power,wheel" \
             -s /bin/bash "${user}" && printf "[+] user '%s' created\n" "${user}"
         set_passwd "${user}"
-        mv /tmp/shell/user/.bashrc "/home/${user}/"
-        cp "/home/${user}/.bashrc" "/home/${user}/.bash_profile"
+        mv /tmp/shell/user/.bash* "/home/${user}/"
+        mv /tmp/shell/user/.Xresources "/home/${user}/"
         chown -R "${user}:users" "/home/${user}"
     fi
 
