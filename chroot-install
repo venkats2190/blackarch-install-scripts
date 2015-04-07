@@ -34,7 +34,7 @@ FAILURE=31337
 VERBOSE="/dev/null"
 
 # blackarch-install version
-VERSION="v0.8.1"
+VERSION="v0.8.2"
 
 # colors
 WHITE="$(tput setaf 7)"
