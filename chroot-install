@@ -350,6 +350,8 @@ install_packages_repo()
             blackarch-config-wmii blackarch-config-spectrwm fluxbox openbox \
             awesome spectrwm blackarch-dwm i3-wm wmii blackarch-config-gtk \
             --noconfirm --force
+            # misc packages
+            pacman -S firefox opera wicd-gtk wicd
        fi
     fi
 
