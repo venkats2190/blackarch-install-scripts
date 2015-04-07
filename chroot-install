@@ -474,7 +474,7 @@ generate_initramfs()
 {
     header "Creating initramfs"
 
-    sed -i 's/block filesystems/block encrypt filesystems/' /etc/mkinitcpio.conf
+    sed -i 's/block filesystems/block keymap encrypt filesystems/' /etc/mkinitcpio.conf
 
     mkinitcpio -p linux
 
