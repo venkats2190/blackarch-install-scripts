@@ -351,7 +351,7 @@ install_packages_repo()
             awesome spectrwm blackarch-dwm i3-wm wmii blackarch-config-gtk \
             --noconfirm --force
             # misc packages
-            pacman -S firefox opera wicd-gtk wicd
+            pacman -S firefox opera wicd-gtk wicd --noconfirm --force
        fi
     fi
 
